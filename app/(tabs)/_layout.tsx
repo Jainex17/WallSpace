@@ -1,11 +1,22 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Entypo from '@expo/vector-icons/Entypo';
 import { Tabs } from 'expo-router';
+import { useColorScheme } from 'react-native';
 
 export default function TabLayout() {
+  
+  const theme = useColorScheme() === "dark" ? "black" : "white";
+  const oppositeTheme = useColorScheme() === "dark" ? "white" : "black";
+
   return (
     <Tabs 
-      screenOptions={{ tabBarActiveTintColor: 'blue', headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: oppositeTheme,
+        tabBarStyle: {
+          backgroundColor: theme,
+        },
+      }}
     >
       <Tabs.Screen
         name="forYou"

@@ -11,14 +11,11 @@ import {
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Feather from "@expo/vector-icons/Feather";
+import { WallpaperTypes } from "@/hooks/useWallPapers";
 
-interface Wallpaper {
-  title: string;
-  imageuri: string;
-}
 
 interface BottomPanelProps {
-  selectedWallpaper: Wallpaper;
+  selectedWallpaper: WallpaperTypes;
   onClose: () => void;
 }
 
