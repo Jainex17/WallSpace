@@ -1,74 +1,85 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { useState, useMemo } from "react";
+import {
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  View,
+  Dimensions,
+} from "react-native";
+import BottomPanel from "@/components/BottomPanel";
+import ParallaxScrollView from "@/components/ParallaxScrollView";
+import ImageCard from "@/components/ImageCard";
+import Wallpapers from "@/hooks/useWallPapers";
+import { FlatList } from "react-native-gesture-handler";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const { width } = Dimensions.get('window');
 
-export default function HomeScreen() {
+interface Wallpaper {
+  title: string;
+  imageuri: string;
+}
+
+export default function Explore() {
+  
+  const wallapapers = Wallpapers();
+  const [selectedWallpaper, setSelectedWallpaper] = useState<Wallpaper | null>(null);
+
+  const renderItem = ({ item }: {item : Wallpaper}) => (
+    <View style={styles.imageWrapper}>
+      <ImageCard imageUrl={item.imageuri} title={item.title} onPress={()=> setSelectedWallpaper(item)} />
+    </View>
+  );
+
+  // Memoize the renderItem function to prevent unnecessary re-renders
+  const memoizedRenderItem = useMemo(() => renderItem, []);
+
   return (
+    <SafeAreaView style={{ flex: 1 }}>
     <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerBackgroundColor={{ dark: "black", light: "white" }}
       headerImage={
         <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+          style={{ flex: 1 }}
+          source={{
+            uri: "https://ideogram.ai/assets/image/lossless/response/rnfyKYz1SKKx0xnr_eU6RQ",
+          }}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
+      }
+    >
+      <View style={styles.container}>
+        <View style={styles.listContainer}>
+          <FlatList
+            data={wallapapers}
+            renderItem={memoizedRenderItem}
+            keyExtractor={(item) => item.title}
+            numColumns={2}
+            columnWrapperStyle={styles.row}
+            contentContainerStyle={styles.gridContainer}
+            scrollEnabled={false}
+          />
+        </View>
+      </View>
     </ParallaxScrollView>
+    {selectedWallpaper && <BottomPanel selectedWallpaper={selectedWallpaper} onClose={()=> setSelectedWallpaper(null)} />}
+  </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  container: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  listContainer: {
+    flex: 1,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  gridContainer: {
+    paddingTop: 5,
+  },
+  row: {
+    justifyContent: 'space-between',
+  },
+  imageWrapper: {
+    width: width / 2 - 15,
+    marginBottom: 3,
   },
 });
