@@ -1,10 +1,11 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
+import { ThemeProvider } from '@/context/ThemeContext';
 
 export default function Layout() {
   
   return (
-    <>
+    <ThemeProvider>
       <GestureHandlerRootView>
           <Stack
             screenOptions={{
@@ -22,6 +23,6 @@ export default function Layout() {
           </Stack>
         {/* <Slot />  // dont need to use this because of stack from expo-router */}
       </GestureHandlerRootView>
-    </>
+    </ThemeProvider>
   );
 }

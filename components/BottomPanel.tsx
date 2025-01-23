@@ -9,10 +9,11 @@ import {
   Pressable,
 } from "react-native";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
-import Ionicons from '@expo/vector-icons/Ionicons';
+import Ionicons from "@expo/vector-icons/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
 import { WallpaperTypes } from "@/hooks/useWallPapers";
-
+import { useTheme } from "@/context/ThemeContext";
+import { Colors } from "@/constants/Colors";
 
 interface BottomPanelProps {
   selectedWallpaper: WallpaperTypes;
@@ -22,8 +23,7 @@ interface BottomPanelProps {
 const BottomPanel = ({ selectedWallpaper, onClose }: BottomPanelProps) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
 
-  const theme = useColorScheme() === "dark" ? "black" : "white";
-  const oppositeTheme = useColorScheme() === "dark" ? "white" : "black";
+  const { theme, currentTheme } = useTheme();
 
   return (
     <BottomSheet
@@ -35,7 +35,10 @@ const BottomPanel = ({ selectedWallpaper, onClose }: BottomPanelProps) => {
       handleStyle={{ display: "none" }}
     >
       <BottomSheetView
-        style={[styles.contentContainer, { backgroundColor: theme }]}
+        style={[
+          styles.contentContainer,
+          { backgroundColor: Colors[currentTheme].background },
+        ]}
       >
         <Pressable style={styles.closeButton} onPress={onClose}>
           <Ionicons name="close" size={25} />
@@ -46,21 +49,26 @@ const BottomPanel = ({ selectedWallpaper, onClose }: BottomPanelProps) => {
           resizeMode="cover"
         ></Image>
 
-        <Text style={[styles.title, { color: oppositeTheme }]}>
+        <Text style={[styles.title, { color: Colors[currentTheme].text }]}>
           {selectedWallpaper.title}
         </Text>
 
         <Pressable
           onPress={() => {}}
-          style={[styles.downloadbtn, { backgroundColor: oppositeTheme }]}
+          style={[
+            styles.downloadbtn,
+            { backgroundColor: Colors[currentTheme].tint },
+          ]}
         >
           <Feather
             name="download"
             size={20}
             style={{ marginRight: 10 }}
-            color={theme}
+            color={Colors[currentTheme].background}
           />
-          <Text style={[styles.downloadtxt, { color: theme }]}>
+          <Text
+            style={[styles.downloadtxt, { color: Colors[currentTheme].background }]}
+          >
             Download Wallpaper
           </Text>
         </Pressable>
@@ -101,9 +109,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    padding: 10,
+    padding: 13,
     borderRadius: 10,
-    marginHorizontal: 30,
+    width: "80%",
     marginVertical: 10,
   },
   downloadtxt: {

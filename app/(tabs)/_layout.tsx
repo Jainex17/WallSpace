@@ -1,28 +1,30 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import Entypo from '@expo/vector-icons/Entypo';
 import { Tabs } from 'expo-router';
-import { useColorScheme } from 'react-native';
+import Entypo from '@expo/vector-icons/Entypo';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Colors } from '@/constants/Colors';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function TabLayout() {
   
-  const theme = useColorScheme() === "dark" ? "black" : "white";
-  const oppositeTheme = useColorScheme() === "dark" ? "white" : "black";
+  const { theme, currentTheme } = useTheme();
 
   return (
     <Tabs 
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: oppositeTheme,
+        tabBarActiveTintColor: Colors[currentTheme].tint,
         tabBarStyle: {
-          backgroundColor: theme,
+          backgroundColor: Colors[currentTheme].background,
         },
+        
       }}
     >
       <Tabs.Screen
         name="forYou"
         options={{
           title: 'For You',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
+          tabBarIcon: ({ color }) => <FontAwesome5 size={28} name="home" color={color} />,
         }}
       />
       <Tabs.Screen
@@ -36,7 +38,7 @@ export default function TabLayout() {
         name="account"
         options={{
           title: 'Account',
-          tabBarIcon: ({ color }) => <FontAwesome size={28} name="cog" color={color} />,
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="account-circle" color={color} />,
         }}
       />
             {/* <Slot />  // dont need to use this because of Tabs from expo-router */} 
