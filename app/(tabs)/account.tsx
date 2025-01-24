@@ -1,22 +1,46 @@
 import { Link } from "expo-router";
-import { Pressable, SafeAreaView, StyleSheet, Text, View } from "react-native";
+import {
+  Pressable,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  ToastAndroid,
+  View,
+} from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
+import { ScrollView } from "react-native-gesture-handler";
+import ThemeStatusBar from "@/components/ThemedStatusBar";
 
 export default function Account() {
   const { theme, currentTheme, setTheme } = useTheme();
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <ThemedView style={styles.container}>
-        <Text style={[styles.heading, { color: Colors[currentTheme].text }]}>WallX</Text>
-        <Text style={[styles.subheading, { color: Colors[currentTheme].text }]}>Sign in to save your data</Text>
+    <ThemedView style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <Text style={[styles.heading, { color: Colors[currentTheme].text }]}>
+          WallX
+        </Text>
+        <Text style={[styles.subheading, { color: Colors[currentTheme].tabIconDefault }]}>
+          Sign in to save your data
+        </Text>
 
-        <View style={[ styles.signupcontainer, { backgroundColor: Colors[currentTheme].secondaryBackground } ]}>
+        <View
+          style={[
+            styles.signupcontainer,
+            { backgroundColor: Colors[currentTheme].secondaryBackground },
+          ]}
+        >
           <Pressable
-            style={[ styles.signupbutton, { backgroundColor: Colors[currentTheme].secondaryBackground, borderColor: Colors[currentTheme].text } ]}
+            style={[
+              styles.signupbutton,
+              {
+                backgroundColor: Colors[currentTheme].secondaryBackground,
+                borderColor: Colors[currentTheme].text,
+              },
+            ]}
             onPress={() => console.log("Sign in with Google")}
           >
             <AntDesign
@@ -25,68 +49,134 @@ export default function Account() {
               color={Colors[currentTheme].text}
               style={{ marginRight: 30, position: "absolute", left: 30 }}
             />
-            <Text style={[ styles.signupbuttontext, { color: Colors[currentTheme].text} ]}>Sign in</Text>
+            <Text
+              style={[
+                styles.signupbuttontext,
+                { color: Colors[currentTheme].text },
+              ]}
+            >
+              Sign in
+            </Text>
           </Pressable>
         </View>
 
-        <Text style={[styles.settingsTitle, { color: Colors[currentTheme].text }]}>
+        <Text
+          style={[styles.settingsTitle, { color: Colors[currentTheme].text }]}
+        >
           Settings
         </Text>
 
-        <Text style={[styles.sectionTitle, { color: Colors[currentTheme].text }]}>
+        <Text
+          style={[styles.sectionTitle, { color: Colors[currentTheme].text }]}
+        >
           Theme
         </Text>
 
         <View style={styles.themeButtonsContainer}>
-          {(['system', 'dark', 'light'] as const).map((themeOption) => (
+          {(["system", "dark", "light"] as const).map((themeOption) => (
             <Pressable
               key={themeOption}
               onPress={() => setTheme(themeOption)}
               style={[
                 styles.themebtn,
                 {
-                  backgroundColor: theme === themeOption 
-                    ? Colors[currentTheme].tint 
-                    : Colors[currentTheme].background,
-                  borderColor: Colors[currentTheme].tint
-                }
+                  backgroundColor:
+                    theme === themeOption
+                      ? Colors[currentTheme].tint
+                      : Colors[currentTheme].background,
+                  borderColor: Colors[currentTheme].tint,
+                },
               ]}
             >
-              <Text style={[
-                styles.themetext,
-                { color: theme === themeOption 
-                  ? Colors[currentTheme].background 
-                  : Colors[currentTheme].text 
-                }
-              ]}>
+              <Text
+                style={[
+                  styles.themetext,
+                  {
+                    color:
+                      theme === themeOption
+                        ? Colors[currentTheme].background
+                        : Colors[currentTheme].text,
+                  },
+                ]}
+              >
                 {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
               </Text>
             </Pressable>
           ))}
         </View>
-      </ThemedView>
-    </SafeAreaView>
+
+        <View style={{ marginTop: 25, alignItems: "center" }}>
+          <Text
+            style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}
+          >
+            WallX © 2025,
+          </Text>
+          <Text
+            style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}
+          >
+            WallX Wallpapaer Mobile App LLC.
+          </Text>
+        </View>
+
+        <View style={{ marginTop: 25, flexDirection: "column" }}>
+          <Text
+            style={[styles.settingsTitle, { color: Colors[currentTheme].text }]}
+          >
+            About
+          </Text>
+          <Pressable>
+            <Text
+              style={[
+                styles.sectionTitle,
+                { color: Colors[currentTheme].text, paddingVertical: 15 },
+              ]}
+            >
+              Account
+            </Text>
+          </Pressable>
+          <Text
+            style={[styles.sectionTitle, { color: Colors[currentTheme].text, paddingVertical: 15 }]}
+          >
+            Privacy Policy
+          </Text>
+          <Text
+            style={[styles.sectionTitle, { color: Colors[currentTheme].text, paddingVertical: 15 }]}
+          >
+            Terms of Service
+          </Text>
+          <Text
+            style={[styles.sectionTitle, { color: Colors[currentTheme].text, paddingVertical: 15 }]}
+            onPress={() =>
+              ToastAndroid.show("WallX v1.0.0", ToastAndroid.SHORT)
+            }
+          >
+            Versions
+          </Text>
+        </View>
+      </ScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   heading: {
     fontSize: 30,
-    paddingHorizontal: 5,
+    marginHorizontal: 20,
+    paddingTop: 20,
     fontWeight: "900",
   },
   subheading: {
     fontSize: 14,
-    paddingHorizontal: 5,
+    marginHorizontal: 20,
   },
   signupcontainer: {
     marginVertical: 20,
     padding: 30,
     borderRadius: 15,
+    marginHorizontal: 20,
   },
   signupbutton: {
     flexDirection: "row",
@@ -117,13 +207,14 @@ const styles = StyleSheet.create({
   },
   settingsTitle: {
     fontSize: 28,
-    fontWeight: "bold",
+    fontWeight: "900",
     padding: 10,
+    marginHorizontal: 20,
   },
   sectionTitle: {
     fontSize: 18,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingHorizontal: 30,
+    paddingVertical: 10,
     fontWeight: "700",
   },
   themeButtonsContainer: {
@@ -131,5 +222,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: 10,
     paddingVertical: 5,
-  }
+    marginHorizontal: 20,
+  },
 });

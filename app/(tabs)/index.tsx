@@ -8,10 +8,7 @@ import {
 } from "react-native";
 import BottomPanel from "@/components/BottomPanel";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
-import ImageCard from "@/components/ImageCard";
 import Wallpapers, { WallpaperTypes } from "@/hooks/useWallPapers";
-import { FlatList } from "react-native-gesture-handler";
-import { ThemedView } from "@/components/ThemedView";
 import WallpapersGrid from "@/components/WallpapersGrid";
 
 const { width } = Dimensions.get("window");
