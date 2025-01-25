@@ -4,16 +4,15 @@ import ImageCard from "./ImageCard";
 import { useMemo, useState } from "react";
 import BottomPanel from "./BottomPanel";
 import { WallpaperTypes } from "@/hooks/useWallPapers";
+import { StatusBar } from "expo-status-bar";
 
 export default function WallpapersGrid({
   wallpapers,
-  setSelectedWallpaper
+  setSelectedWallpaper,
 }: {
-  wallpapers: WallpaperTypes[],
+  wallpapers: WallpaperTypes[];
   setSelectedWallpaper: (wallpaper: WallpaperTypes) => void;
 }) {
-  
-
   const renderItem = ({ item }: { item: WallpaperTypes }) => (
     <View style={styles.imageWrapper}>
       <ImageCard
@@ -31,14 +30,14 @@ export default function WallpapersGrid({
     <>
       <View style={styles.container}>
         <FlatList
-            data={wallpapers}
-            renderItem={memoizedRenderItem}
-            keyExtractor={(item, idx) => `${item.title}-${idx}`}
-            numColumns={2}
-            columnWrapperStyle={styles.row}
-            contentContainerStyle={styles.gridContainer}
-            scrollEnabled={false}
-          />
+          data={wallpapers}
+          renderItem={memoizedRenderItem}
+          keyExtractor={(item, idx) => `${item.title}-${idx}`}
+          numColumns={2}
+          columnWrapperStyle={styles.row}
+          contentContainerStyle={styles.gridContainer}
+          scrollEnabled={false}
+        />
       </View>
     </>
   );

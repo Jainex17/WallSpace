@@ -59,3 +59,24 @@ export default function Wallpapers(): WallpaperTypes[] {
 
   return wallpapersarr;
 }
+
+
+export function CarouselWallPapers(): WallpaperTypes[] {
+  return [
+    {
+      imageuri:
+        "https://wallpapers.com/images/high/creepy-aesthetic-nrmstbq1d710rbnv.webp",
+      title: "realm of dark",
+    },
+    {
+      imageuri:
+        "https://wallpapers.com/images/high/creepy-aesthetic-njt3bncykm1kow9c.webp",
+      title: "Explore the secrets",
+    },
+    {
+      imageuri:
+        "https://wallpapers.com/images/high/aesthetic-star-laptop-oddefnpota4nnr64.webp",
+      title: "Aesthetic Girl",
+    },
+  ];
+};

@@ -33,6 +33,7 @@ const BottomPanel = ({ selectedWallpaper, onClose }: BottomPanelProps) => {
       snapPoints={["95%"]}
       handleIndicatorStyle={{ display: "none" }}
       handleStyle={{ display: "none" }}
+      style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30}}
     >
       <BottomSheetView
         style={[
