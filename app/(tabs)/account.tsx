@@ -1,18 +1,11 @@
 import { Link } from "expo-router";
-import {
-  Pressable,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  ToastAndroid,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, ToastAndroid, View } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
 import { ScrollView } from "react-native-gesture-handler";
-import ThemeStatusBar from "@/components/ThemedStatusBar";
+import { ThemedText } from "@/components/ThemedText";
 
 export default function Account() {
   const { theme, currentTheme, setTheme } = useTheme();
@@ -20,12 +13,12 @@ export default function Account() {
   return (
     <ThemedView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
-        <Text style={[styles.heading, { color: Colors[currentTheme].text }]}>
+        <ThemedText type="title" style={styles.heading}>
           WallX
-        </Text>
-        <Text style={[styles.subheading, { color: Colors[currentTheme].tabIconDefault }]}>
+        </ThemedText>
+        <ThemedText type="subtitle" style={styles.subheading}>
           Sign in to save your data
-        </Text>
+        </ThemedText>
 
         <View
           style={[
@@ -49,28 +42,25 @@ export default function Account() {
               color={Colors[currentTheme].text}
               style={{ marginRight: 30, position: "absolute", left: 30 }}
             />
-            <Text
-              style={[
-                styles.signupbuttontext,
-                { color: Colors[currentTheme].text },
-              ]}
-            >
+            <ThemedText type="title" style={styles.signupbuttontext}>
               Sign in
-            </Text>
+            </ThemedText>
           </Pressable>
         </View>
 
-        <Text
-          style={[styles.settingsTitle, { color: Colors[currentTheme].text }]}
+        <ThemedText
+          type="title"
+          style={styles.settingsTitle}
         >
           Settings
-        </Text>
+        </ThemedText>
 
-        <Text
-          style={[styles.sectionTitle, { color: Colors[currentTheme].text }]}
+        <ThemedText
+          type="title"
+          style={styles.sectionTitle}
         >
           Theme
-        </Text>
+        </ThemedText>
 
         <View style={styles.themeButtonsContainer}>
           {(["system", "dark", "light"] as const).map((themeOption) => (
@@ -135,17 +125,26 @@ export default function Account() {
             </Text>
           </Pressable>
           <Text
-            style={[styles.sectionTitle, { color: Colors[currentTheme].text, paddingVertical: 15 }]}
+            style={[
+              styles.sectionTitle,
+              { color: Colors[currentTheme].text, paddingVertical: 15 },
+            ]}
           >
             Privacy Policy
           </Text>
           <Text
-            style={[styles.sectionTitle, { color: Colors[currentTheme].text, paddingVertical: 15 }]}
+            style={[
+              styles.sectionTitle,
+              { color: Colors[currentTheme].text, paddingVertical: 15 },
+            ]}
           >
             Terms of Service
           </Text>
           <Text
-            style={[styles.sectionTitle, { color: Colors[currentTheme].text, paddingVertical: 15 }]}
+            style={[
+              styles.sectionTitle,
+              { color: Colors[currentTheme].text, paddingVertical: 15 },
+            ]}
             onPress={() =>
               ToastAndroid.show("WallX v1.0.0", ToastAndroid.SHORT)
             }

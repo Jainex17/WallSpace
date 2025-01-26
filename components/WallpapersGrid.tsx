@@ -1,10 +1,8 @@
 import { Dimensions, StyleSheet, View } from "react-native";
 import { FlatList } from "react-native-gesture-handler";
 import ImageCard from "./ImageCard";
-import { useMemo, useState } from "react";
-import BottomPanel from "./BottomPanel";
+import { useMemo } from "react";
 import { WallpaperTypes } from "@/hooks/useWallPapers";
-import { StatusBar } from "expo-status-bar";
 
 export default function WallpapersGrid({
   wallpapers,
