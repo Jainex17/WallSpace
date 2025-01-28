@@ -26,7 +26,7 @@ const ERROR_MESSAGES = {
   DOWNLOAD_FAILED: "Failed to download wallpaper",
   SAVE_FAILED: "Failed to save wallpaper",
   SHARE_FAILED: "Could not share the wallpaper",
-  LIKE_FAILED: "Failed to update favorites"
+  LIKE_FAILED: "Failed to update favorites",
 };
 
 interface BottomPanelProps {
@@ -52,14 +52,19 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
     onClose();
   }, [onClose]);
 
-  const showAlert = useCallback((title: string, message: string) => {
-    Alert.alert(title, message, undefined, { userInterfaceStyle: currentTheme });
-  }, [currentTheme]);
+  const showAlert = useCallback(
+    (title: string, message: string) => {
+      Alert.alert(title, message, undefined, {
+        userInterfaceStyle: currentTheme,
+      });
+    },
+    [currentTheme]
+  );
 
   const handleDownloadBtn = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    
+
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
@@ -80,7 +85,7 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
       await MediaLibrary.saveToLibraryAsync(downloadResult.uri);
       showAlert("Success", "Wallpaper saved to your photos!");
     } catch (error) {
-      console.error('Download error:', error);
+      console.error("Download error:", error);
       showAlert("Error", ERROR_MESSAGES.SAVE_FAILED);
     } finally {
       setIsLoading(false);
@@ -90,51 +95,59 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
   const handleShareBtn = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    
+
     try {
       const fileUri = `${FileSystem.documentDirectory}wallpaper.jpg`;
       await FileSystem.downloadAsync(selectedWallpaper.imageuri, fileUri);
-      
+
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri);
       } else {
         showAlert("Info", "Sharing is not available on this device");
       }
     } catch (error) {
-      console.error('Share error:', error);
+      console.error("Share error:", error);
       showAlert("Error", ERROR_MESSAGES.SHARE_FAILED);
     } finally {
       setIsLoading(false);
     }
   }, [selectedWallpaper.imageuri, showAlert, isLoading]);
 
-  const updateLikedWallpapers = useCallback(async (wallpaperId: string, shouldAdd: boolean) => {
-    try {
-      const storedData = await AsyncStorage.getItem(STORAGE_KEY.LIKED_WALLPAPERS);
-      const likedWallpapers = storedData ? JSON.parse(storedData) : [];
-      
-      const updatedWallpapers = shouldAdd
-        ? [...new Set([...likedWallpapers, wallpaperId])]
-        : likedWallpapers.filter((id: string) => id !== wallpaperId);
-      
-      await AsyncStorage.setItem(
-        STORAGE_KEY.LIKED_WALLPAPERS,
-        JSON.stringify(updatedWallpapers)
-      );
-      
-      return true;
-    } catch (error) {
-      console.error('Storage error:', error);
-      return false;
-    }
-  }, []);
+  const updateLikedWallpapers = useCallback(
+    async (wallpaperId: string, shouldAdd: boolean) => {
+      try {
+        const storedData = await AsyncStorage.getItem(
+          STORAGE_KEY.LIKED_WALLPAPERS
+        );
+        const likedWallpapers = storedData ? JSON.parse(storedData) : [];
+
+        const updatedWallpapers = shouldAdd
+          ? [...new Set([...likedWallpapers, wallpaperId])]
+          : likedWallpapers.filter((id: string) => id !== wallpaperId);
+
+        await AsyncStorage.setItem(
+          STORAGE_KEY.LIKED_WALLPAPERS,
+          JSON.stringify(updatedWallpapers)
+        );
+
+        return true;
+      } catch (error) {
+        console.error("Storage error:", error);
+        return false;
+      }
+    },
+    []
+  );
 
   const handleLikeBtn = useCallback(async () => {
     if (isLoading) return;
     setIsLoading(true);
-    
+
     try {
-      const success = await updateLikedWallpapers(selectedWallpaper.id, !isLiked);
+      const success = await updateLikedWallpapers(
+        selectedWallpaper.id,
+        !isLiked
+      );
       if (success) {
         setIsLiked(!isLiked);
         refreshLiked(); // This now comes from useWallpaper
@@ -142,24 +155,33 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
         showAlert("Error", ERROR_MESSAGES.LIKE_FAILED);
       }
     } catch (error) {
-      console.error('Like error:', error);
+      console.error("Like error:", error);
       showAlert("Error", ERROR_MESSAGES.LIKE_FAILED);
     } finally {
       setIsLoading(false);
     }
-  }, [isLiked, selectedWallpaper.id, updateLikedWallpapers, showAlert, isLoading, refreshLiked]);
+  }, [
+    isLiked,
+    selectedWallpaper.id,
+    updateLikedWallpapers,
+    showAlert,
+    isLoading,
+    refreshLiked,
+  ]);
 
   // Check if wallpaper is liked on mount
   useEffect(() => {
     const checkLiked = async () => {
       try {
-        const storedData = await AsyncStorage.getItem(STORAGE_KEY.LIKED_WALLPAPERS);
+        const storedData = await AsyncStorage.getItem(
+          STORAGE_KEY.LIKED_WALLPAPERS
+        );
         if (storedData) {
           const likedWallpapers = JSON.parse(storedData);
           setIsLiked(likedWallpapers.includes(selectedWallpaper.id));
         }
       } catch (error) {
-        console.error('Error checking liked status:', error);
+        console.error("Error checking liked status:", error);
       }
     };
     checkLiked();

@@ -6,8 +6,8 @@ export interface WallpaperTypes {
   id: string;
 }
 
-const ACCESS_KEY = 'KEY'
-const ACCESS_KEY1 = 'KEY'
+const ACCESS_KEY = 'E26GBCuswAtWEn-amZJ_h_yJI_xRRld5ICryr8p1DVw'; // not mine :)
+const ACCESS_KEY1 = 'wefY-JAWTnZUoVNcKJscWENryeTi7CSYuOU16G1fH4w'; // not mine :)
 
 export const STORAGE_KEY = {
   LIKED_WALLPAPERS: 'likedWallpapersID'
