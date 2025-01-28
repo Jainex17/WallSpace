@@ -5,18 +5,17 @@ import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
 import WallpapersGrid from "@/components/WallpapersGrid";
 import { ScrollView } from "react-native-gesture-handler";
-import Wallpapers, { WallpaperTypes } from "@/hooks/useWallPapers";
+import {
+  WallpaperTypes,
+  getLikedWallpapersDetails,
+  getSuggestedWallPapers,
+} from "@/hooks/useWallPapers";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemedSafeArea } from "@/components/ThemedSafeArea";
 import { ThemedText } from "@/components/ThemedText";
 import { useWallpaper } from "@/context/WallpaperContext";
-import { Animated } from "react-native";
-import {
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSpring,
-} from "react-native-reanimated";
+import { Animated, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -53,15 +52,24 @@ export default function ForYou() {
 }
 
 function Suggested() {
+  const [loadingWallpapers, setLoadingWallpapers] = useState(true);
   const [wallpapers, setWallpapers] = useState<WallpaperTypes[]>([]);
-  const { setSelectedWallpaper } = useWallpaper();
 
   useEffect(() => {
-    setWallpapers(Wallpapers());
+    getSuggestedWallPapers().then((data) => {
+      setWallpapers(data);
+      setLoadingWallpapers(false);
+    });
   }, []);
+  const { currentTheme } = useTheme();
 
   return (
     <ThemedSafeArea style={{ flex: 1 }}>
+      <StatusBar
+        style={currentTheme === "dark" ? "light" : "dark"}
+        backgroundColor={Colors[currentTheme].background}
+        translucent={false}
+      />
       <ThemedView style={{ flex: 1 }}>
         <ScrollView
           style={{ flex: 1 }}
@@ -69,7 +77,7 @@ function Suggested() {
         >
           <WallpapersGrid
             wallpapers={wallpapers}
-            setSelectedWallpaper={setSelectedWallpaper}
+            loadingWallpapers={loadingWallpapers}
           />
         </ScrollView>
       </ThemedView>
@@ -79,9 +87,20 @@ function Suggested() {
 
 function Liked() {
   const { currentTheme } = useTheme();
+  const { triggerRefresh } = useWallpaper();
   const scaleAnim = new Animated.Value(1.2);
 
+  const [LikedWallpapers, setLikedWallpapers] = useState<WallpaperTypes[]>([]);
+  const [loadingWallpapers, setLoadingWallpapers] = useState(true);
+
   useEffect(() => {
+    getLikedWallpapersDetails().then((data) => {
+      setLikedWallpapers(data);
+    });
+    setLoadingWallpapers(false);
+  }, [triggerRefresh]);
+
+ useEffect(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(scaleAnim, {
@@ -103,22 +122,33 @@ function Liked() {
       <ThemedView
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
       >
-        <ThemedText type="subtitle" style={{ fontSize: 18 }}>
-          No favorites found
-        </ThemedText>
+        {!loadingWallpapers && LikedWallpapers.length > 0 ? (
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 15 }}
+          >
+            <WallpapersGrid wallpapers={LikedWallpapers} />
+          </ScrollView>
+        ) : (
+          <View>
+            <ThemedText type="subtitle" style={{ fontSize: 18 }}>
+              No favorites found
+            </ThemedText>
 
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <AntDesign
-            name="heart"
-            size={80}
-            color={Colors[currentTheme].tabBarIndicator}
-            style={{ marginVertical: 50 }}
-          />
-        </Animated.View>
+            <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+              <AntDesign
+                name="heart"
+                size={80}
+                color={Colors[currentTheme].tabBarIndicator}
+                style={{ marginVertical: 50 }}
+              />
+            </Animated.View>
 
-        <ThemedText type="subtitle" style={{ fontSize: 17 }}>
-          Wallpapers you "like" will appear here
-        </ThemedText>
+            <ThemedText type="subtitle" style={{ fontSize: 17 }}>
+              Wallpapers you "like" will appear here
+            </ThemedText>
+          </View>
+        )}
       </ThemedView>
     </ThemedSafeArea>
   );

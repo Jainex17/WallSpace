@@ -1,15 +1,33 @@
-import React, { useRef } from "react";
-import { StyleSheet, Image, View, Text, Pressable, Alert } from "react-native";
+import React, { useRef, useEffect, useCallback, useState } from "react";
+import {
+  StyleSheet,
+  Image,
+  View,
+  Text,
+  Pressable,
+  Alert,
+  BackHandler,
+} from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system";
 import BottomSheet, { BottomSheetView } from "@gorhom/bottom-sheet";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
-import { WallpaperTypes } from "@/hooks/useWallPapers";
+import { STORAGE_KEY, WallpaperTypes } from "@/hooks/useWallPapers";
 import { useTheme } from "@/context/ThemeContext";
 import { Colors } from "@/constants/Colors";
-import { AntDesign, FontAwesome } from "@expo/vector-icons";
+import { AntDesign } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useWallpaper } from "@/context/WallpaperContext";
+
+const ERROR_MESSAGES = {
+  PERMISSION: "Please grant permission to save wallpapers",
+  DOWNLOAD_FAILED: "Failed to download wallpaper",
+  SAVE_FAILED: "Failed to save wallpaper",
+  SHARE_FAILED: "Could not share the wallpaper",
+  LIKE_FAILED: "Failed to update favorites"
+};
 
 interface BottomPanelProps {
   selectedWallpaper: WallpaperTypes;
@@ -17,29 +35,38 @@ interface BottomPanelProps {
   style?: object;
 }
 
-const BottomPanel = ({
+const BottomPanel: React.FC<BottomPanelProps> = ({
   selectedWallpaper,
   onClose,
   style,
-}: BottomPanelProps) => {
+}) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const { currentTheme } = useTheme();
+  const [isLiked, setIsLiked] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { refreshLiked } = useWallpaper();
 
-  const handleDownloadBtn = async () => {
+  // Memoized handlers
+  const handleSheetClose = useCallback(() => {
+    bottomSheetRef.current?.close();
+    onClose();
+  }, [onClose]);
+
+  const showAlert = useCallback((title: string, message: string) => {
+    Alert.alert(title, message, undefined, { userInterfaceStyle: currentTheme });
+  }, [currentTheme]);
+
+  const handleDownloadBtn = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    
     try {
-      // Request permissions
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert(
-          "Permission needed",
-          "Please grant permission to save wallpapers",
-          undefined,
-          { userInterfaceStyle: currentTheme }
-        );
+        showAlert("Permission needed", ERROR_MESSAGES.PERMISSION);
         return;
       }
 
-      // Download the file
       const fileUri = `${FileSystem.documentDirectory}wallpaper.jpg`;
       const downloadResult = await FileSystem.downloadAsync(
         selectedWallpaper.imageuri,
@@ -47,50 +74,117 @@ const BottomPanel = ({
       );
 
       if (downloadResult.status !== 200) {
-        Alert.alert("Error", "Failed to download wallpaper", undefined, {
-          userInterfaceStyle: currentTheme,
-        });
-        return;
+        throw new Error(ERROR_MESSAGES.DOWNLOAD_FAILED);
       }
 
-      // Save to media library
       await MediaLibrary.saveToLibraryAsync(downloadResult.uri);
-      Alert.alert("Success", "Wallpaper saved to your photos!", undefined, {
-        userInterfaceStyle: currentTheme,
-      });
+      showAlert("Success", "Wallpaper saved to your photos!");
     } catch (error) {
-      Alert.alert("Error", "Failed to save wallpaper", undefined, {
-        userInterfaceStyle: currentTheme,
-      });
-      console.error(error);
+      console.error('Download error:', error);
+      showAlert("Error", ERROR_MESSAGES.SAVE_FAILED);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [selectedWallpaper.imageuri, showAlert, isLoading]);
 
-  const handleShareBtn = async () => {
+  const handleShareBtn = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    
     try {
-      const fileUri = FileSystem.documentDirectory + "wallpaper.jpg";
+      const fileUri = `${FileSystem.documentDirectory}wallpaper.jpg`;
       await FileSystem.downloadAsync(selectedWallpaper.imageuri, fileUri);
+      
       if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri);
       } else {
-        Alert.alert("Saved", "Wallpaper saved to your device.");
+        showAlert("Info", "Sharing is not available on this device");
       }
     } catch (error) {
-      Alert.alert("Error", "Could not save the wallpaper.");
+      console.error('Share error:', error);
+      showAlert("Error", ERROR_MESSAGES.SHARE_FAILED);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [selectedWallpaper.imageuri, showAlert, isLoading]);
 
-  const handleLikeBtn = () => {
-    // Handle like button
-  }
+  const updateLikedWallpapers = useCallback(async (wallpaperId: string, shouldAdd: boolean) => {
+    try {
+      const storedData = await AsyncStorage.getItem(STORAGE_KEY.LIKED_WALLPAPERS);
+      const likedWallpapers = storedData ? JSON.parse(storedData) : [];
+      
+      const updatedWallpapers = shouldAdd
+        ? [...new Set([...likedWallpapers, wallpaperId])]
+        : likedWallpapers.filter((id: string) => id !== wallpaperId);
+      
+      await AsyncStorage.setItem(
+        STORAGE_KEY.LIKED_WALLPAPERS,
+        JSON.stringify(updatedWallpapers)
+      );
+      
+      return true;
+    } catch (error) {
+      console.error('Storage error:', error);
+      return false;
+    }
+  }, []);
+
+  const handleLikeBtn = useCallback(async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    
+    try {
+      const success = await updateLikedWallpapers(selectedWallpaper.id, !isLiked);
+      if (success) {
+        setIsLiked(!isLiked);
+        refreshLiked(); // This now comes from useWallpaper
+      } else {
+        showAlert("Error", ERROR_MESSAGES.LIKE_FAILED);
+      }
+    } catch (error) {
+      console.error('Like error:', error);
+      showAlert("Error", ERROR_MESSAGES.LIKE_FAILED);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [isLiked, selectedWallpaper.id, updateLikedWallpapers, showAlert, isLoading, refreshLiked]);
+
+  // Check if wallpaper is liked on mount
+  useEffect(() => {
+    const checkLiked = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem(STORAGE_KEY.LIKED_WALLPAPERS);
+        if (storedData) {
+          const likedWallpapers = JSON.parse(storedData);
+          setIsLiked(likedWallpapers.includes(selectedWallpaper.id));
+        }
+      } catch (error) {
+        console.error('Error checking liked status:', error);
+      }
+    };
+    checkLiked();
+  }, [selectedWallpaper.id]);
+
+  // Back handler
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      () => {
+        handleSheetClose();
+        return true;
+      }
+    );
+    return () => backHandler.remove();
+  }, [handleSheetClose]);
 
   return (
     <View style={[styles.container, style]}>
       <BottomSheet
         ref={bottomSheetRef}
-        onClose={onClose}
+        onClose={handleSheetClose}
         enablePanDownToClose
         snapPoints={["100%"]}
+        index={0}
         handleIndicatorStyle={{ display: "none" }}
         handleStyle={{ display: "none" }}
         style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30 }}
@@ -101,8 +195,12 @@ const BottomPanel = ({
             { backgroundColor: Colors[currentTheme].background },
           ]}
         >
-          <Pressable style={styles.closeButton} onPress={onClose}>
-            <Ionicons name="close" size={25} color={"white"} />
+          <Pressable
+            style={styles.closeButton}
+            onPress={handleSheetClose}
+            hitSlop={{ top: 5, bottom: 0, left: 5, right: 5 }}
+          >
+            <Ionicons name="close" size={25} color="white" />
           </Pressable>
           <View
             style={{
@@ -115,7 +213,11 @@ const BottomPanel = ({
             }}
           >
             <Pressable style={styles.rightbtns} onPress={handleLikeBtn}>
-              <AntDesign name="hearto" size={20} color="white" />
+              {isLiked ? (
+                <AntDesign name="heart" size={20} color="red" />
+              ) : (
+                <AntDesign name="hearto" size={20} color="white" />
+              )}
             </Pressable>
             <Pressable style={styles.rightbtns} onPress={handleShareBtn}>
               <AntDesign name="sharealt" size={20} color="white" />
@@ -168,14 +270,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   closeButton: {
-    position: "absolute",
-    top: 15,
     left: 14,
+    top: 15,
+    position: "absolute",
     zIndex: 1,
     backgroundColor: "#2c2c2c",
-    color: "black",
-    padding: 5,
     borderRadius: 50,
+    padding: 5,
+    // width: 40,
+    // height: 40,
+    // alignItems: "center",
+    // justifyContent: "center",
   },
   rightbtns: {
     top: 15,
@@ -184,8 +289,12 @@ const styles = StyleSheet.create({
     zIndex: 1,
     backgroundColor: "#2c2c2c",
     color: "black",
-    padding: 10,
     borderRadius: 50,
+    // padding: 10,
+    width: 40,
+    height: 40,
+    alignItems: "center",
+    justifyContent: "center",
   },
   image: {
     width: "100%",

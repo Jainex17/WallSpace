@@ -17,7 +17,7 @@ const ImageCard = ({ imageUrl, title, onPress }: ImageCardProps) => {
         resizeMode="cover"
       />
       <View style={styles.textContainer}>
-        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
       </View>
     </View>
   </Pressable>
@@ -27,16 +27,10 @@ const ImageCard = ({ imageUrl, title, onPress }: ImageCardProps) => {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
     margin: 10,
     overflow: 'hidden',
   },
   image: {
-    // width: '100%',
     height: 250,
     flex: 1
   },

@@ -3,14 +3,18 @@ import { FlatList } from "react-native-gesture-handler";
 import ImageCard from "./ImageCard";
 import { useMemo } from "react";
 import { WallpaperTypes } from "@/hooks/useWallPapers";
+import { useWallpaper } from "@/context/WallpaperContext";
 
 export default function WallpapersGrid({
   wallpapers,
-  setSelectedWallpaper,
+  loadingWallpapers = false,
 }: {
   wallpapers: WallpaperTypes[];
-  setSelectedWallpaper: (wallpaper: WallpaperTypes) => void;
+  loadingWallpapers?: boolean;
 }) {
+
+  const { setSelectedWallpaper } = useWallpaper();
+
   const renderItem = ({ item }: { item: WallpaperTypes }) => (
     <View style={styles.imageWrapper}>
       <ImageCard

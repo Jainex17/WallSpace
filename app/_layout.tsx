@@ -1,9 +1,8 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
-import { ThemeProvider, useTheme } from "@/context/ThemeContext";
-import ThemeStatusBar from "@/components/ThemedStatusBar";
-import { WallpaperProvider, useWallpaper } from '@/context/WallpaperContext';
-import BottomPanel from "@/components/BottomPanel";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { WallpaperProvider } from '@/context/WallpaperContext';
+import { PageBottomPanel } from "@/components/PageBottomPanel";
 
 function RootLayoutNav() {
   return (
@@ -18,8 +17,6 @@ function RootLayoutNav() {
 }
 
 function RootContent() {
-  const { selectedWallpaper, setSelectedWallpaper } = useWallpaper();
-  
   return (
     <>
       <Stack
@@ -36,21 +33,7 @@ function RootContent() {
           }}
         ></Stack.Screen>
       </Stack>
-      {selectedWallpaper && (
-        <BottomPanel
-          selectedWallpaper={selectedWallpaper}
-          onClose={() => setSelectedWallpaper(null)}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1000,
-          }}
-        />
-      )}
-      <ThemeStatusBar />
+      <PageBottomPanel />
     </>
   );
 }
