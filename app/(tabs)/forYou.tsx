@@ -4,7 +4,7 @@ import { ThemedView } from "@/components/ThemedView";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
 import WallpapersGrid from "@/components/WallpapersGrid";
-import { ScrollView } from "react-native-gesture-handler";
+import { Pressable, ScrollView } from "react-native-gesture-handler";
 import {
   WallpaperTypes,
   getLikedWallpapersDetails,
@@ -14,8 +14,17 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemedSafeArea } from "@/components/ThemedSafeArea";
 import { ThemedText } from "@/components/ThemedText";
 import { useWallpaper } from "@/context/WallpaperContext";
-import { Animated, View } from "react-native";
+import {
+  Animated,
+  Text,
+  TextInput,
+  View,
+  Image,
+  ActivityIndicator,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
+import { Ionicons } from "@expo/vector-icons";
+import { getAIGenratedWallpaper } from "@/hooks/useWallPapers";
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -45,6 +54,7 @@ export default function ForYou() {
         >
           <Tab.Screen name="Suggested" component={Suggested} />
           <Tab.Screen name="Liked" component={Liked} />
+          <Tab.Screen name="AI" component={GenrareWallpaper} />
         </Tab.Navigator>
       </ThemedView>
     </ThemedSafeArea>
@@ -52,16 +62,36 @@ export default function ForYou() {
 }
 
 function Suggested() {
+  const categories = [
+    "All",
+    "Nature",
+    "Space",
+    "Cars",
+    "Animals",
+    "Flowers",
+    "Minimal",
+    "Art",
+    "City",
+    "Food",
+    "Games",
+    "Movies",
+    "Music",
+    "Sports",
+    "Technology",
+    "Travel",
+  ];
+
+  const { currentTheme } = useTheme();
   const [loadingWallpapers, setLoadingWallpapers] = useState(true);
+  const [activeCategory, setActiveCategory] = useState("All");
   const [wallpapers, setWallpapers] = useState<WallpaperTypes[]>([]);
 
   useEffect(() => {
-    getSuggestedWallPapers().then((data) => {
+    getSuggestedWallPapers(activeCategory).then((data) => {
       setWallpapers(data);
       setLoadingWallpapers(false);
     });
-  }, []);
-  const { currentTheme } = useTheme();
+  }, [activeCategory]);
 
   return (
     <ThemedSafeArea style={{ flex: 1 }}>
@@ -73,12 +103,59 @@ function Suggested() {
       <ThemedView style={{ flex: 1 }}>
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 15 }}
+          contentContainerStyle={{ paddingTop: 15 }}
         >
-          <WallpapersGrid
-            wallpapers={wallpapers}
-            loadingWallpapers={loadingWallpapers}
-          />
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{
+              gap: 15,
+              paddingBottom: 15,
+              paddingHorizontal: 15,
+              height: 50,
+            }}
+          >
+            {categories.map((category) => (
+              <Pressable
+                key={category}
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 7,
+                  backgroundColor:
+                    category === activeCategory
+                      ? Colors[currentTheme].tint
+                      : Colors[currentTheme].secondaryBackground,
+                  borderRadius: 12,
+                }}
+                onPress={() => setActiveCategory(category)}
+              >
+                <ThemedText
+                  type="title"
+                  style={{
+                    fontSize: 15,
+                    color:
+                      category === activeCategory
+                        ? Colors[currentTheme].background
+                        : Colors[currentTheme].text,
+                    fontWeight: "500",
+                  }}
+                >
+                  {category}
+                </ThemedText>
+              </Pressable>
+            ))}
+          </ScrollView>
+          
+          <View
+            style={{
+              paddingHorizontal: 15,
+            }}
+          >
+            <WallpapersGrid
+              wallpapers={wallpapers}
+              loadingWallpapers={loadingWallpapers}
+            />
+          </View>
         </ScrollView>
       </ThemedView>
     </ThemedSafeArea>
@@ -88,10 +165,9 @@ function Suggested() {
 function Liked() {
   const { currentTheme } = useTheme();
   const { triggerRefresh } = useWallpaper();
-  const scaleAnim = new Animated.Value(1.2);
-
   const [LikedWallpapers, setLikedWallpapers] = useState<WallpaperTypes[]>([]);
   const [loadingWallpapers, setLoadingWallpapers] = useState(true);
+  const scaleAnim = useState(() => new Animated.Value(1))[0];
 
   useEffect(() => {
     getLikedWallpapersDetails().then((data) => {
@@ -100,7 +176,7 @@ function Liked() {
     setLoadingWallpapers(false);
   }, [triggerRefresh]);
 
- useEffect(() => {
+  useEffect(() => {
     Animated.loop(
       Animated.sequence([
         Animated.timing(scaleAnim, {
@@ -109,7 +185,7 @@ function Liked() {
           useNativeDriver: true,
         }),
         Animated.timing(scaleAnim, {
-          toValue: 1.2,
+          toValue: 1,
           duration: 1000,
           useNativeDriver: true,
         }),
@@ -119,9 +195,7 @@ function Liked() {
 
   return (
     <ThemedSafeArea style={{ flex: 1 }}>
-      <ThemedView
-        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-      >
+      <ThemedView style={{ flex: 1 }}>
         {!loadingWallpapers && LikedWallpapers.length > 0 ? (
           <ScrollView
             style={{ flex: 1 }}
@@ -130,7 +204,9 @@ function Liked() {
             <WallpapersGrid wallpapers={LikedWallpapers} />
           </ScrollView>
         ) : (
-          <View>
+          <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+          >
             <ThemedText type="subtitle" style={{ fontSize: 18 }}>
               No favorites found
             </ThemedText>
@@ -150,6 +226,134 @@ function Liked() {
           </View>
         )}
       </ThemedView>
+    </ThemedSafeArea>
+  );
+}
+
+function GenrareWallpaper() {
+  const { currentTheme } = useTheme();
+  const [keyword, setKeyword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { setSelectedWallpaper, setIsLikeBtnVisible } = useWallpaper();
+
+  const [generatedImage, setGeneratedImage] = useState<WallpaperTypes>();
+
+  async function handleGenrateWallpaperBtn() {
+    if (!keyword.trim()) return;
+    if (keyword.length < 5)
+      return alert("Keyword must be atleast 5 characters long");
+    setIsLoading(true);
+    setGeneratedImage(undefined);
+    try {
+      const data = await getAIGenratedWallpaper(keyword);
+
+      if (!data || data.imageuri == "") {
+        setIsLoading(false);
+        return alert("No wallpaper found for this keyword");
+      }
+
+      setGeneratedImage(data);
+    } catch (error) {
+      console.error("Failed to generate wallpaper:", error);
+    }
+  }
+
+  return (
+    <ThemedSafeArea style={{ flex: 1 }}>
+      <ScrollView style={{ flex: 1 }}>
+        <Text
+          style={{
+            fontSize: 22,
+            fontWeight: "600",
+            textAlign: "center",
+            marginTop: 25,
+            color: Colors[currentTheme].text,
+          }}
+        >
+          Generate Wallpaper With AI
+        </Text>
+
+        <TextInput
+          style={{
+            backgroundColor: Colors[currentTheme].secondaryBackground,
+            paddingHorizontal: 15,
+            paddingVertical: 15,
+            borderRadius: 10,
+            marginHorizontal: 20,
+            marginTop: 25,
+            fontSize: 16,
+            color: Colors[currentTheme].text,
+          }}
+          placeholderTextColor={Colors[currentTheme].tabIconDefault}
+          placeholder="Enter a keyword"
+          value={keyword}
+          onChangeText={setKeyword}
+        />
+
+        <Pressable
+          style={{
+            backgroundColor: Colors[currentTheme].tint,
+            padding: 15,
+            borderRadius: 10,
+            marginHorizontal: 20,
+            marginVertical: 20,
+            flexDirection: "row",
+            justifyContent: "center",
+            gap: 10,
+            opacity: isLoading ? 0.7 : 1,
+          }}
+          onPress={handleGenrateWallpaperBtn}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator color={Colors[currentTheme].background} />
+          ) : (
+            <>
+              <Ionicons
+                style={{ alignSelf: "center" }}
+                name="sparkles-sharp"
+                size={18}
+                color={Colors[currentTheme].background}
+              />
+              <Text
+                style={{
+                  fontWeight: "600",
+                  fontSize: 18,
+                  textAlign: "center",
+                  color: Colors[currentTheme].background,
+                }}
+              >
+                Generate Wallpaper
+              </Text>
+            </>
+          )}
+        </Pressable>
+
+        {generatedImage && (
+          <Pressable
+            onPress={() => {
+              setIsLikeBtnVisible(false);
+              setSelectedWallpaper({
+                id: generatedImage.id,
+                imageuri: generatedImage.imageuri,
+                title: generatedImage.title,
+              });
+            }}
+            style={{ paddingHorizontal: 20 }}
+          >
+            <Image
+              source={{ uri: generatedImage.imageuri }}
+              style={{
+                width: "100%",
+                height: 400,
+                borderRadius: 10,
+              }}
+              resizeMode="cover"
+              onLoadEnd={() => setIsLoading(false)}
+            />
+          </Pressable>
+        )}
+      </ScrollView>
     </ThemedSafeArea>
   );
 }

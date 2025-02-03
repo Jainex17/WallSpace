@@ -3,7 +3,7 @@ import { useWallpaper } from '@/context/WallpaperContext';
 import BottomPanel from './BottomPanel';
 
 export function PageBottomPanel() {
-  const { selectedWallpaper, setSelectedWallpaper } = useWallpaper();
+  const { selectedWallpaper, setSelectedWallpaper, isLikeBtnVisible } = useWallpaper();
 
   if (!selectedWallpaper) return null;
 
@@ -17,8 +17,9 @@ export function PageBottomPanel() {
         left: 0,
         right: 0,
         bottom: 0,
-        zIndex: 1000,
+        zIndex: 10,
       }}
+      isLikeBtnVisible={isLikeBtnVisible}
     />
   );
 }

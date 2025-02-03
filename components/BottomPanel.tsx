@@ -33,12 +33,14 @@ interface BottomPanelProps {
   selectedWallpaper: WallpaperTypes;
   onClose: () => void;
   style?: object;
+  isLikeBtnVisible?: boolean;
 }
 
 const BottomPanel: React.FC<BottomPanelProps> = ({
   selectedWallpaper,
   onClose,
   style,
+  isLikeBtnVisible = true,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const { currentTheme } = useTheme();
@@ -210,6 +212,12 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
         handleIndicatorStyle={{ display: "none" }}
         handleStyle={{ display: "none" }}
         style={{ borderTopLeftRadius: 30, borderTopRightRadius: 30 }}
+        backgroundComponent={({ style }) => (
+          <View
+            style={[style, { backgroundColor: Colors[currentTheme].background }]}
+          />
+        )}
+
       >
         <BottomSheetView
           style={[
@@ -234,6 +242,7 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
               zIndex: 1,
             }}
           >
+            {isLikeBtnVisible && (
             <Pressable style={styles.rightbtns} onPress={handleLikeBtn}>
               {isLiked ? (
                 <AntDesign name="heart" size={20} color="red" />
@@ -241,6 +250,7 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
                 <AntDesign name="hearto" size={20} color="white" />
               )}
             </Pressable>
+            )}
             <Pressable style={styles.rightbtns} onPress={handleShareBtn}>
               <AntDesign name="sharealt" size={20} color="white" />
             </Pressable>
@@ -337,12 +347,21 @@ const styles = StyleSheet.create({
     padding: 13,
     borderRadius: 7,
     width: "80%",
-    marginVertical: 25,
+    marginTop: 25,
   },
   downloadtxt: {
     fontSize: 16,
     fontWeight: "700",
     textAlign: "center",
+  },
+  setWallpaper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 13,
+    borderRadius: 7,
+    width: "80%",
+    marginTop: 15,
   },
 });
 

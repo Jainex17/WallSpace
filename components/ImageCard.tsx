@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 
 interface ImageCardProps {
@@ -8,19 +8,45 @@ interface ImageCardProps {
 }
 
 const ImageCard = ({ imageUrl, title, onPress }: ImageCardProps) => {
+  const [loading, setLoading] = useState(true);
+
+  const handleLoadStart = () => {
+    setLoading(true);
+  };
+
+  const handleLoadEnd = () => {
+    setLoading(false);
+  };
+
+  const handleLoad = () => {
+    setLoading(false);
+  };
+
+  const memorizedImage = useMemo(() => (
+    <Image
+      style={styles.image}
+      source={{ uri: imageUrl }}
+      onLoadStart={handleLoadStart}
+      onLoadEnd={handleLoadEnd}
+      onLoad={handleLoad}
+      resizeMode="cover"
+    />
+  ), [imageUrl]);
+
   return (
     <Pressable onPress={onPress} style={styles.card}>
-    <View>
-      <Image
-        source={{ uri: imageUrl }}
-        style={styles.image}
-        resizeMode="cover"
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+      <View>
+        {loading && (
+          <View 
+            style={[styles.image, styles.skeleton]}
+          />
+        )}
+        {memorizedImage}
+        <View style={styles.textContainer}>
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+        </View>
       </View>
-    </View>
-  </Pressable>
+    </Pressable>
   );
 };
 
@@ -48,6 +74,12 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginBottom: 5,
   },
+  skeleton: {
+    backgroundColor: "grey",
+    position: 'absolute',
+    width: '100%',
+    height: 250,
+  }
 });
 
 export default ImageCard;
