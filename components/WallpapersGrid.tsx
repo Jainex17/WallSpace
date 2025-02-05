@@ -13,14 +13,17 @@ export default function WallpapersGrid({
   loadingWallpapers?: boolean;
 }) {
 
-  const { setSelectedWallpaper } = useWallpaper();
+  const { setSelectedWallpaper, setIsLikeBtnVisible } = useWallpaper();
 
   const renderItem = ({ item }: { item: WallpaperTypes }) => (
     <View style={styles.imageWrapper}>
       <ImageCard
         imageUrl={item.imageuri}
         title={item.title}
-        onPress={() => setSelectedWallpaper(item)}
+        onPress={() => {
+          setIsLikeBtnVisible(true);
+          setSelectedWallpaper(item);
+        }}
       />
     </View>
   );
@@ -37,7 +40,6 @@ export default function WallpapersGrid({
           keyExtractor={(item, idx) => `${item.title}-${idx}`}
           numColumns={2}
           columnWrapperStyle={styles.row}
-          contentContainerStyle={styles.gridContainer}
           scrollEnabled={false}
         />
       </View>
@@ -50,18 +52,15 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingVertical: 6,
   },
   listContainer: {
     flex: 1,
-  },
-  gridContainer: {
-    paddingTop: 5,
   },
   row: {
     justifyContent: "space-between",
   },
   imageWrapper: {
     width: width / 2 - 15,
-    marginBottom: 3,
   },
 });

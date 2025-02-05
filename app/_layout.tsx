@@ -32,6 +32,17 @@ function RootContent() {
             headerBackTitle: "Go Back",
           }}
         ></Stack.Screen>
+
+        <Stack.Screen
+          name="(nobottombar)/SearchPage"
+          options={{
+            headerShown: true,
+            headerTitle: "Search",
+            headerBackTitle: "Go Back",
+          }}
+        ></Stack.Screen>
+
+        
       </Stack>
       <PageBottomPanel />
     </>

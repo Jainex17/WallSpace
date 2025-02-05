@@ -19,26 +19,26 @@ export function getCarouselWallPapers(): WallpaperTypes[] {
     {
       id: "1",
       imageuri:
-        "https://wallpapers.com/images/high/creepy-aesthetic-nrmstbq1d710rbnv.webp",
-      title: "realm of dark",
+        "https://images.unsplash.com/photo-1684262483735-1101bcb10f0d?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      title: "",
     },
     {
       id: "2",
       imageuri:
-        "https://wallpapers.com/images/high/creepy-aesthetic-njt3bncykm1kow9c.webp",
-      title: "Explore the secrets",
+        "https://images.unsplash.com/photo-1738417715244-338e5a70bdda?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      title: "",
     },
     {
       id: "3",
       imageuri:
-        "https://wallpapers.com/images/high/aesthetic-star-laptop-oddefnpota4nnr64.webp",
-      title: "Aesthetic Girl",
+        "https://images.unsplash.com/photo-1738167039036-de7b00545f01?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      title: "",
     },
     {
       id: "4",
       imageuri:
-        "https://wallpapers.com/images/high/calm-anime-man-holding-sword-az7md4eyd2fh53lg.webp",
-      title: "Man Holding Sword",
+        "https://images.unsplash.com/photo-1738236013982-9449791344de?q=80&w=1873&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      title: "",
     },
   ];
 }
@@ -55,7 +55,8 @@ export async function getExploreWallpapers(query = 'mobile wallpaper', count = 1
       );
       
       if (!response.ok) {
-          throw new Error('Network response was not ok');
+        console.error('Error fetching wallpapers:', response);
+        return [];
       }
 
       const data = await response.json();
@@ -82,7 +83,8 @@ export async function getSuggestedWallPapers(query = 'nature', count = 20): Prom
       );
       
       if (!response.ok) {
-          throw new Error('Network response was not ok');
+          console.error('Error fetching wallpapers:', response);
+          return [];    
       }
 
       const data = await response.json();
@@ -148,15 +150,30 @@ export async function getAIGenratedWallpaper(query = 'nature'): Promise<Wallpape
     const result = await generateImage(query, true);
     
     if (!result) {
-      throw new Error('Generation failed - no response');
+      console.error('Error generating AI wallpaper');
+      return {
+        id: '',
+        imageuri: '',
+        title: query,
+      }
     }
 
     if (result.status === 'FAILED') {
-      throw new Error('Generation failed - server error');
+      console.error('AI wallpaper generation failed');
+      return {
+        id: '',
+        imageuri: '',
+        title: query,
+      }
     }
 
     if (result.result?.output?.length === 0) {
-      throw new Error('No images generated');
+      console.error('AI wallpaper generation failed');
+      return {
+        id: '',
+        imageuri: '',
+        title: query,
+      }
     }
 
     return {
@@ -186,7 +203,8 @@ async function checkImageStatus(processId: string): Promise<MonsterAPIStatusResp
     );
     
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      console.error('Error checking status:', response);
+      return null;
     }
 
     const data = await response.json();
@@ -222,7 +240,8 @@ async function generateImage(
     );
     
     if (!response.ok) {
-      throw new Error("Network response was not ok");
+      console.error('Error generating image:', response);
+      return null;
     }
     
     const data = await response.json() as MonsterAPIGenerateResponse;
@@ -240,7 +259,8 @@ async function generateImage(
       if (!result) break;
 
       if (attempts >= maxAttempts) {
-        throw new Error('Generation timeout');
+        console.error('Timeout generating image');
+        return null;
       }
 
       if (['IN_PROGRESS', 'IN_QUEUE'].includes(result.status)) {

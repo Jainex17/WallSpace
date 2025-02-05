@@ -65,6 +65,7 @@ function Suggested() {
   const categories = [
     "All",
     "Nature",
+    "Anime",
     "Space",
     "Cars",
     "Animals",

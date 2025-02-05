@@ -1,13 +1,12 @@
 import { Tabs } from "expo-router";
 import Entypo from "@expo/vector-icons/Entypo";
-import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
 import { Pressable } from "react-native";
 
 export default function TabLayout() {
-  const { theme, currentTheme } = useTheme();
+  const { currentTheme } = useTheme();
 
   return (
     <Tabs
@@ -15,11 +14,15 @@ export default function TabLayout() {
         headerShown: false,
         tabBarActiveTintColor: Colors[currentTheme].tint,
         tabBarStyle: {
-          backgroundColor: Colors[currentTheme].background,
+          backgroundColor: `${Colors[currentTheme].background}ee`, // 80% opacity
           borderTopWidth: 0,
           height: 80,
           paddingHorizontal: 30,
           paddingTop: 10,
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          bottom: 0,
         },
         tabBarLabelStyle: {
           fontSize: 13,
@@ -30,6 +33,7 @@ export default function TabLayout() {
           <Pressable {...props} android_ripple={{ color: "transparent" }} />
         ),
       }}
+      
     >
       <Tabs.Screen
         name="forYou"
@@ -58,7 +62,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* <Slot />  // dont need to use this because of Tabs from expo-router */}
     </Tabs>
   );
 }
