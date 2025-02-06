@@ -1,8 +1,9 @@
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
-import { ThemeProvider } from "@/context/ThemeContext";
+import { ThemeProvider, useTheme } from "@/context/ThemeContext";
 import { WallpaperProvider } from '@/context/WallpaperContext';
 import { PageBottomPanel } from "@/components/PageBottomPanel";
+import { Colors } from "@/constants/Colors";
 
 function RootLayoutNav() {
   return (
@@ -17,11 +18,18 @@ function RootLayoutNav() {
 }
 
 function RootContent() {
+
+  const { currentTheme } = useTheme();
+
   return (
     <>
       <Stack
         screenOptions={{
           headerShown: false,
+          headerStyle: {
+            backgroundColor: Colors[currentTheme].background,
+          },
+          headerTintColor: Colors[currentTheme].text,
         }}
       >
         <Stack.Screen
@@ -36,7 +44,7 @@ function RootContent() {
         <Stack.Screen
           name="(nobottombar)/SearchPage"
           options={{
-            headerShown: true,
+            headerShown: false,
             headerTitle: "Search",
             headerBackTitle: "Go Back",
           }}

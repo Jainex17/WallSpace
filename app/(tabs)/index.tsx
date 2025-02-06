@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { View } from "react-native";
 import BottomPanel from "@/components/BottomPanel";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import {
   getCarouselWallPapers,
-  getExploreWallpapers,
   WallpaperTypes,
+  useWallpaperData,
 } from "@/hooks/useWallPapers";
 import WallpapersGrid from "@/components/WallpapersGrid";
 import { StatusBar } from "expo-status-bar";
@@ -18,19 +18,10 @@ import { router, useNavigation } from 'expo-router';
 
 const Explore = () => {
   const { currentTheme } = useTheme();
-
-  const [loadingWallpapers, setLoadingWallpapers] = useState(true);
-  const [wallpapers, setWallpapers] = useState<WallpaperTypes[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-
+  const { data: wallpapers, loading: loadingWallpapers } = useWallpaperData();
   const carouselWallPapers: WallpaperTypes[] = getCarouselWallPapers();
 
-  useEffect(() => {
-    getExploreWallpapers().then((data) => {
-      setWallpapers(data);
-      setLoadingWallpapers(false);
-    });
-  }, []);
   const navigation = useNavigation();
 
   function handleSearch(query: string) {
@@ -61,7 +52,7 @@ const Explore = () => {
         style={{
           backgroundColor: "transparent",
           marginHorizontal: 5,
-          marginVertical: 2,
+          marginTop: 2,
         }}
       >
         <Searchbar
@@ -89,10 +80,12 @@ const Explore = () => {
         }}
         headerImage={<Carousel carouselWallPapers={carouselWallPapers} />}
       >
+        <View style={{ flex: 1, marginBottom: 90 }}>
         <WallpapersGrid
           wallpapers={wallpapers}
           loadingWallpapers={loadingWallpapers}
         />
+        </View>
       </ParallaxScrollView>
     </ThemedSafeArea>
   );

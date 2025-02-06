@@ -8,7 +8,7 @@ import { Pressable, ScrollView } from "react-native-gesture-handler";
 import {
   WallpaperTypes,
   getLikedWallpapersDetails,
-  getSuggestedWallPapers,
+  useWallpaperData,
 } from "@/hooks/useWallPapers";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemedSafeArea } from "@/components/ThemedSafeArea";
@@ -62,6 +62,10 @@ export default function ForYou() {
 }
 
 function Suggested() {
+  const { currentTheme } = useTheme();
+  const [activeCategory, setActiveCategory] = useState("All");
+  const { data: wallpapers, loading: loadingWallpapers } = useWallpaperData(activeCategory);
+
   const categories = [
     "All",
     "Nature",
@@ -81,18 +85,6 @@ function Suggested() {
     "Technology",
     "Travel",
   ];
-
-  const { currentTheme } = useTheme();
-  const [loadingWallpapers, setLoadingWallpapers] = useState(true);
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [wallpapers, setWallpapers] = useState<WallpaperTypes[]>([]);
-
-  useEffect(() => {
-    getSuggestedWallPapers(activeCategory).then((data) => {
-      setWallpapers(data);
-      setLoadingWallpapers(false);
-    });
-  }, [activeCategory]);
 
   return (
     <ThemedSafeArea style={{ flex: 1 }}>
@@ -150,6 +142,7 @@ function Suggested() {
           <View
             style={{
               paddingHorizontal: 15,
+              paddingBottom: 80
             }}
           >
             <WallpapersGrid
@@ -166,15 +159,24 @@ function Suggested() {
 function Liked() {
   const { currentTheme } = useTheme();
   const { triggerRefresh } = useWallpaper();
-  const [LikedWallpapers, setLikedWallpapers] = useState<WallpaperTypes[]>([]);
+  const [likedWallpapers, setLikedWallpapers] = useState<WallpaperTypes[]>([]);
   const [loadingWallpapers, setLoadingWallpapers] = useState(true);
   const scaleAnim = useState(() => new Animated.Value(1))[0];
 
   useEffect(() => {
-    getLikedWallpapersDetails().then((data) => {
-      setLikedWallpapers(data);
-    });
-    setLoadingWallpapers(false);
+    let mounted = true;
+    
+    const fetchLiked = async () => {
+      setLoadingWallpapers(true);
+      const data = await getLikedWallpapersDetails();
+      if (mounted) {
+        setLikedWallpapers(data);
+        setLoadingWallpapers(false);
+      }
+    };
+
+    fetchLiked();
+    return () => { mounted = false; };
   }, [triggerRefresh]);
 
   useEffect(() => {
@@ -197,12 +199,12 @@ function Liked() {
   return (
     <ThemedSafeArea style={{ flex: 1 }}>
       <ThemedView style={{ flex: 1 }}>
-        {!loadingWallpapers && LikedWallpapers.length > 0 ? (
+        {!loadingWallpapers && likedWallpapers.length > 0 ? (
           <ScrollView
             style={{ flex: 1 }}
             contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 15 }}
           >
-            <WallpapersGrid wallpapers={LikedWallpapers} />
+            <WallpapersGrid wallpapers={likedWallpapers} />
           </ScrollView>
         ) : (
           <View

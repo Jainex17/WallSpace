@@ -68,12 +68,6 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
     setIsLoading(true);
 
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        showAlert("Permission needed", ERROR_MESSAGES.PERMISSION);
-        return;
-      }
-
       const fileUri = `${FileSystem.documentDirectory}wallpaper.jpg`;
       const downloadResult = await FileSystem.downloadAsync(
         selectedWallpaper.imageuri,
@@ -84,8 +78,18 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
         throw new Error(ERROR_MESSAGES.DOWNLOAD_FAILED);
       }
 
-      await MediaLibrary.saveToLibraryAsync(downloadResult.uri);
-      showAlert("Success", "Wallpaper saved to your photos!");
+      const saveimage = await MediaLibrary.saveToLibraryAsync(downloadResult.uri);
+      if(saveimage !== undefined){
+        showAlert("Success", "Wallpaper saved to your photos!");
+      }else {
+        const { status } = await MediaLibrary.requestPermissionsAsync();
+      if (status !== "granted") {
+        showAlert("Permission needed", ERROR_MESSAGES.PERMISSION);
+        return;
+      }
+
+      await MediaLibrary.saveToLibraryAsync(fileUri);
+      }
     } catch (error) {
       console.error("Download error:", error);
       showAlert("Error", ERROR_MESSAGES.SAVE_FAILED);
@@ -170,6 +174,43 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
     isLoading,
     refreshLiked,
   ]);
+
+  const handleSaveBtn = () => {
+    Alert.alert(
+      'Set Wallpaper',
+      'Where would you like to set this wallpaper?',
+      [
+        {
+          text: 'Home Screen',
+          onPress: () => setWallpaperLocation('home'),
+        },
+        {
+          text: 'Lock Screen',
+          onPress: () => setWallpaperLocation('lock'),
+        },
+        {
+          text: 'Both',
+          onPress: () => setWallpaperLocation('both'),
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ],
+      { cancelable: true, userInterfaceStyle: currentTheme }
+    );
+  };
+
+  const setWallpaperLocation = async (location: 'home' | 'lock' | 'both') => {
+    if (isLoading) return;
+
+    try {
+      // TODO
+    } catch (error) {
+      console.error('Wallpaper setting error:', error);
+      showAlert('Error', 'Failed to set wallpaper');
+    }
+  };
 
   // Check if wallpaper is liked on mount
   useEffect(() => {
@@ -265,28 +306,50 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
             {selectedWallpaper.title}
           </Text>
 
+            <View style={{ flexDirection: "row", gap: 20 }}>
           <Pressable
             onPress={handleDownloadBtn}
             style={[
               styles.downloadbtn,
-              { backgroundColor: Colors[currentTheme].tint },
+              { backgroundColor: Colors[currentTheme].secondaryBackground},
             ]}
           >
             <Feather
               name="download"
               size={20}
               style={{ marginRight: 10 }}
-              color={Colors[currentTheme].background}
+              color={Colors[currentTheme].text}
             />
+            <Text
+              style={[
+                styles.downloadtxt,
+                { color: Colors[currentTheme].text },
+              ]}
+            >
+              Save
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={handleSaveBtn}
+            style={[
+              styles.downloadbtn,
+              { backgroundColor: Colors[currentTheme].tint },
+            ]}
+          >
+            <Feather name="image"
+              size={20}
+              style={{ marginRight: 10 }}
+              color={Colors[currentTheme].background} />
             <Text
               style={[
                 styles.downloadtxt,
                 { color: Colors[currentTheme].background },
               ]}
             >
-              Download Wallpaper
+              Set
             </Text>
           </Pressable>
+          </View>
         </BottomSheetView>
       </BottomSheet>
     </View>
@@ -346,8 +409,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 13,
     borderRadius: 7,
-    width: "80%",
+    width: "40%",
     marginTop: 25,
+    fontWeight: "800",
   },
   downloadtxt: {
     fontSize: 16,

@@ -160,6 +160,7 @@ export default function Account() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginBottom: 90,
   },
   heading: {
     fontSize: 30,

@@ -1,45 +1,38 @@
 import { SafeAreaView, ScrollView, Text, View } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import { Searchbar } from "react-native-paper";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { debounce } from 'lodash';
 import { Colors } from "@/constants/Colors";
 import { useTheme } from "@/context/ThemeContext";
-import { getExploreWallpapers, WallpaperTypes } from "@/hooks/useWallPapers";
+import { useWallpaperData } from "@/hooks/useWallPapers";
 import WallpapersGrid from "@/components/WallpapersGrid";
 
 export default function SearchPage() {
-  let { query }: { query: string } = useLocalSearchParams();
-
-  const [searchLoding, setSearchLoading] = useState<boolean>(true);
-  const [searchQuery, setSearchQuery] = useState<string>(query || "");
-  const [wallpapers, setWallpapers] = useState<WallpaperTypes[]>([]);
+  const { query: initialQuery }: { query: string } = useLocalSearchParams();
+  const [searchQuery, setSearchQuery] = useState<string>(initialQuery || "");
+  const { data: wallpapers, loading: searchLoading } = useWallpaperData(searchQuery);
   const { currentTheme } = useTheme();
 
-  function handleSearch(_query: string) {
-    if (query === "") {
-      return;
-    }
+  // Debounced search handler
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      if (query.trim() !== "") {
+        setSearchQuery(query);
+      }
+    }, 500),
+    []
+  );
 
-    getSearchWallpapers(_query);
-  }
-
-  function getSearchWallpapers(query: string) {
-    setSearchLoading(true);
-    getExploreWallpapers(query).then((data) => {
-      setWallpapers(data);
-    });
-    setSearchLoading(false);
-  }
-
-  useEffect(() => {
-    getSearchWallpapers(query);
-  }, [query]);
+  const handleSearch = (query: string) => {
+    debouncedSearch(query);
+  };
 
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: Colors[currentTheme].background }}
     >
-      <ScrollView>
+      
         <View
           style={{
             backgroundColor: "transparent",
@@ -49,7 +42,7 @@ export default function SearchPage() {
         >
           <Searchbar
             placeholder="Search Wallpapers"
-            onChangeText={(query) => setSearchQuery(query)}
+            onChangeText={(query) => handleSearch(query)}
             value={searchQuery}
             onSubmitEditing={() => handleSearch(searchQuery)}
             style={{
@@ -65,15 +58,16 @@ export default function SearchPage() {
             placeholderTextColor={Colors[currentTheme].tabIconDefault}
           />
         </View>
+        <ScrollView>
         <View
           style={{
             flex: 1,
             backgroundColor: Colors[currentTheme].background,
             marginHorizontal: 15,
-            marginBottom: 60,
+            marginBottom: 10,
           }}
         >
-          {searchLoding ? (
+          {searchLoading ? (
             <Text>Loading...</Text>
           ) : (
             <WallpapersGrid wallpapers={wallpapers} />
