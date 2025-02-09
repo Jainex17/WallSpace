@@ -4,10 +4,11 @@ import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 interface ImageCardProps {
     imageUrl: string;
     title: string;
+    color? : string;
     onPress?: () => void;
 }
 
-const ImageCard = ({ imageUrl, title, onPress }: ImageCardProps) => {
+const ImageCard = ({ imageUrl, title, color = "rgba(0, 0, 0, 0.70)", onPress }: ImageCardProps) => {
   const [loading, setLoading] = useState(true);
 
   const handleLoadStart = () => {
@@ -42,9 +43,9 @@ const ImageCard = ({ imageUrl, title, onPress }: ImageCardProps) => {
           />
         )}
         {memorizedImage}
-        <View style={styles.textContainer}>
+        {/* <View style={[styles.textContainer, { backgroundColor: color }]}>
           <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
-        </View>
+        </View> */}
       </View>
     </Pressable>
   );
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     left: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.70)',
+    // backgroundColor: 'rgba(0, 0, 0, 0.70)',
     width: '100%',
   },
   title: {

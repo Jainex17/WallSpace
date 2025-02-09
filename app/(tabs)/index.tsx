@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { View } from "react-native";
-import BottomPanel from "@/components/BottomPanel";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import {
   getCarouselWallPapers,
@@ -21,8 +20,6 @@ const Explore = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: wallpapers, loading: loadingWallpapers } = useWallpaperData();
   const carouselWallPapers: WallpaperTypes[] = getCarouselWallPapers();
-
-  const navigation = useNavigation();
 
   function handleSearch(query: string) {
     if (query === "") {

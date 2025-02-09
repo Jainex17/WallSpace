@@ -1,4 +1,3 @@
-import { Link } from "expo-router";
 import { Pressable, StyleSheet, Text, ToastAndroid, View } from "react-native";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { ThemedView } from "@/components/ThemedView";

@@ -20,6 +20,7 @@ export default function WallpapersGrid({
       <ImageCard
         imageUrl={item.imageuri}
         title={item.title}
+        color={item.color}
         onPress={() => {
           setIsLikeBtnVisible(true);
           setSelectedWallpaper(item);
@@ -52,7 +53,7 @@ const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingVertical: 6,
+    paddingVertical: 3,
   },
   listContainer: {
     flex: 1,
