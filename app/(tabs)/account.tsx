@@ -16,49 +16,7 @@ export default function Account() {
           WallX
         </ThemedText>
         <ThemedText type="subtitle" style={styles.subheading}>
-          Sign in to save your data
-        </ThemedText>
-
-        <View
-          style={[
-            styles.signupcontainer,
-            { backgroundColor: Colors[currentTheme].secondaryBackground },
-          ]}
-        >
-          <Pressable
-            style={[
-              styles.signupbutton,
-              {
-                backgroundColor: Colors[currentTheme].secondaryBackground,
-                borderColor: Colors[currentTheme].text,
-              },
-            ]}
-            onPress={() => console.log("Sign in with Google")}
-          >
-            <AntDesign
-              name="google"
-              size={24}
-              color={Colors[currentTheme].text}
-              style={{ marginRight: 30, position: "absolute", left: 30 }}
-            />
-            <ThemedText type="title" style={styles.signupbuttontext}>
-              Sign in
-            </ThemedText>
-          </Pressable>
-        </View>
-
-        <ThemedText
-          type="title"
-          style={styles.settingsTitle}
-        >
-          Settings
-        </ThemedText>
-
-        <ThemedText
-          type="title"
-          style={styles.sectionTitle}
-        >
-          Theme
+          Chnage your home with WallX
         </ThemedText>
 
         <View style={styles.themeButtonsContainer}>
@@ -94,20 +52,7 @@ export default function Account() {
           ))}
         </View>
 
-        <View style={{ marginTop: 25, alignItems: "center" }}>
-          <Text
-            style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}
-          >
-            WallX © 2025,
-          </Text>
-          <Text
-            style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}
-          >
-            WallX Wallpapaer Mobile App LLC.
-          </Text>
-        </View>
-
-        <View style={{ marginTop: 25, flexDirection: "column" }}>
+        <View style={{ marginTop: 15, flexDirection: "column" }}>
           <Text
             style={[styles.settingsTitle, { color: Colors[currentTheme].text }]}
           >
@@ -149,6 +94,19 @@ export default function Account() {
             }
           >
             Versions
+          </Text>
+        </View>
+
+        <View style={{ marginTop: 20, alignItems: "center" }}>
+          <Text
+            style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}
+          >
+            WallX © 2025,
+          </Text>
+          <Text
+            style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}
+          >
+            WallX Wallpapaer Mobile App LLC.
           </Text>
         </View>
       </ScrollView>
@@ -220,7 +178,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingTop: 30,
     marginHorizontal: 20,
   },
 });
