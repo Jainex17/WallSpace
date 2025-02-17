@@ -11,10 +11,28 @@ export const getCarouselWallpapers = (req: Request, res: Response) => {
   const wallpapers = [
     {
       id: "1",
-      imageuri: "https://images.unsplash.com/photo-1684262483735-1101bcb10f0d",
+      imageuri:
+        "https://images.unsplash.com/photo-1684262483735-1101bcb10f0d?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       title: "",
     },
-    // ...Add other carousel wallpapers
+    {
+      id: "2",
+      imageuri:
+        "https://images.unsplash.com/photo-1738417715244-338e5a70bdda?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      title: "",
+    },
+    {
+      id: "3",
+      imageuri:
+        "https://images.unsplash.com/photo-1738167039036-de7b00545f01?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      title: "",
+    },
+    {
+      id: "4",
+      imageuri:
+        "https://images.unsplash.com/photo-1738236013982-9449791344de?q=80&w=1873&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      title: "",
+    },
   ];
   res.json(wallpapers);
 };
