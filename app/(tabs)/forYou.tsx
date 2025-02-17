@@ -69,21 +69,21 @@ function Suggested() {
   const categories = [
     "All",
     "Nature",
+    "Cars",
     "Anime",
     "Space",
-    "Cars",
-    "Animals",
-    "Flowers",
-    "Minimal",
-    "Art",
-    "City",
-    "Food",
     "Games",
-    "Movies",
-    "Music",
-    "Sports",
-    "Technology",
     "Travel",
+    "Art",
+    "Animals",
+    "Music",
+    "Food",
+    "Technology",
+    "Flowers",
+    "Movies",
+    "Minimal",
+    "Sports",
+    "City",
   ];
 
   return (
@@ -195,7 +195,7 @@ function Liked() {
       ])
     ).start();
   }, []);
-
+  
   return (
     <ThemedSafeArea style={{ flex: 1 }}>
       <ThemedView style={{ flex: 1 }}>
@@ -280,13 +280,17 @@ function GenrareWallpaper() {
           style={{
             backgroundColor: Colors[currentTheme].secondaryBackground,
             paddingHorizontal: 15,
-            paddingVertical: 15,
+            paddingVertical: 12,
             borderRadius: 10,
             marginHorizontal: 20,
             marginTop: 25,
             fontSize: 16,
             color: Colors[currentTheme].text,
+            height: 50, // Fixed height
+            textAlignVertical: 'center',
           }}
+          multiline={false} // Prevent multiple lines
+          maxLength={100} // Limit text length
           placeholderTextColor={Colors[currentTheme].tabIconDefault}
           placeholder="Enter a keyword"
           value={keyword}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View } from "react-native";
 import ParallaxScrollView from "@/components/ParallaxScrollView";
 import {
@@ -19,7 +19,15 @@ const Explore = () => {
   const { currentTheme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const { data: wallpapers, loading: loadingWallpapers } = useWallpaperData();
-  const carouselWallPapers: WallpaperTypes[] = getCarouselWallPapers();
+  const [carouselWallPapers, setCarouselWallPapers] = useState<WallpaperTypes[]>([]);
+
+  useEffect(() => {
+    const fetchCarouselWallpapers = async () => {
+      const wallpapers = await getCarouselWallPapers();
+      setCarouselWallPapers(wallpapers);
+    };
+    fetchCarouselWallpapers();
+  }, []);
 
   function handleSearch(query: string) {
     if (query === "") {

@@ -58,16 +58,6 @@ export default function Account() {
           >
             About
           </Text>
-          <Pressable>
-            <Text
-              style={[
-                styles.sectionTitle,
-                { color: Colors[currentTheme].text, paddingVertical: 15 },
-              ]}
-            >
-              Account
-            </Text>
-          </Pressable>
           <Text
             style={[
               styles.sectionTitle,
@@ -101,7 +91,7 @@ export default function Account() {
           <Text
             style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}
           >
-            WallX © 2025,
+            Created by Jainex
           </Text>
           <Text
             style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}

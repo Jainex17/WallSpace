@@ -311,32 +311,11 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
             onPress={handleDownloadBtn}
             style={[
               styles.downloadbtn,
-              { backgroundColor: Colors[currentTheme].secondaryBackground},
+              { backgroundColor: Colors[currentTheme].tint },
             ]}
           >
             <Feather
               name="download"
-              size={20}
-              style={{ marginRight: 10 }}
-              color={Colors[currentTheme].text}
-            />
-            <Text
-              style={[
-                styles.downloadtxt,
-                { color: Colors[currentTheme].text },
-              ]}
-            >
-              Save
-            </Text>
-          </Pressable>
-          <Pressable
-            onPress={handleSaveBtn}
-            style={[
-              styles.downloadbtn,
-              { backgroundColor: Colors[currentTheme].tint },
-            ]}
-          >
-            <Feather name="image"
               size={20}
               style={{ marginRight: 10 }}
               color={Colors[currentTheme].background} />
@@ -346,7 +325,7 @@ const BottomPanel: React.FC<BottomPanelProps> = ({
                 { color: Colors[currentTheme].background },
               ]}
             >
-              Set
+              Save
             </Text>
           </Pressable>
           </View>
@@ -409,7 +388,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     padding: 13,
     borderRadius: 7,
-    width: "40%",
+    width: "80%",
     marginTop: 25,
     fontWeight: "800",
   },

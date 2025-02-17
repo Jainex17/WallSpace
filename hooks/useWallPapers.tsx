@@ -9,9 +9,34 @@ export interface WallpaperTypes {
   blur_hash?: string;
 }
 
-const ACCESS_KEY = process.env.EXPO_PUBLIC_ACCESS_KEY;
-const ACCESS_KEY1 = process.env.EXPO_PUBLIC_ACCESS_KEY1;
-const MONSTER_API_KEY = process.env.EXPO_PUBLIC_MONSTER_API_KEY;
+interface GenerateWallpaperRequest {
+  prompt: string;
+}
+
+interface GenerateWallpaperResponse {
+  message: string;
+  process_id: string;
+  status_url: string;
+  callback_url: string;
+  webhook_url: string;
+}
+
+interface StatusCheckRequest {
+  process_id: string;
+}
+
+interface StatusCheckResponse {
+  status: "PENDING" | "COMPLETED" | "FAILED";
+  imageUrl?: string;
+  process_id: string;
+  result?: {
+    output?: string[];
+    imageUrl?: string;
+  };
+}
+
+const BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+const API_BASE = `${BACKEND_URL}/api/v1/wallpapers`;
 
 export const STORAGE_KEY = {
   LIKED_WALLPAPERS: "likedWallpapersID",
@@ -21,33 +46,23 @@ export const STORAGE_KEY = {
 const apiCache: Record<string, { data: any; timestamp: number }> = {};
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export function getCarouselWallPapers(): WallpaperTypes[] {
-  return [
-    {
-      id: "1",
-      imageuri:
-        "https://images.unsplash.com/photo-1684262483735-1101bcb10f0d?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      title: "",
-    },
-    {
-      id: "2",
-      imageuri:
-        "https://images.unsplash.com/photo-1738417715244-338e5a70bdda?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      title: "",
-    },
-    {
-      id: "3",
-      imageuri:
-        "https://images.unsplash.com/photo-1738167039036-de7b00545f01?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      title: "",
-    },
-    {
-      id: "4",
-      imageuri:
-        "https://images.unsplash.com/photo-1738236013982-9449791344de?q=80&w=1873&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      title: "",
-    },
-  ];
+export async function getCarouselWallPapers(): Promise<WallpaperTypes[]> {
+  try {    
+    const response = await fetch(`${API_BASE}/carousel`, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching carousel:", error);
+    return [];
+  }
 }
 
 export function useWallpaperData(query?: string) {
@@ -98,28 +113,12 @@ export async function getExploreWallpapers(
 ): Promise<WallpaperTypes[]> {
   try {
     const response = await fetch(
-      `https://api.unsplash.com/photos/random?query=${query}&count=${count}`,
-      {
-        headers: {
-          Authorization: `Client-ID ${ACCESS_KEY}`,
-        },
-      }
+      `${API_BASE}/explore?query=${query}&count=${count}`
     );
-    if (!response.ok) {
-      console.error("Error fetching wallpapers:", response);
-      return [];
-    }
-
-    const data = await response.json();
-    return data.map((photo: any) => ({
-      id: photo.id,
-      imageuri: photo.urls.regular,
-      title: photo.alt_description || "Wallpaper",
-      blur_hash: photo.blur_hash,
-      color: photo.color,
-    }));
+    if (!response.ok) return [];
+    return await response.json();
   } catch (error) {
-    console.error("Catch Error fetching wallpapers:", error);
+    console.error("Error fetching explore wallpapers:", error);
     return [];
   }
 }
@@ -151,29 +150,12 @@ export async function getSuggestedWallPapers(
 ): Promise<WallpaperTypes[]> {
   try {
     const response = await fetch(
-      `https://api.unsplash.com/photos/random?query=${query}&count=${count}`,
-      {
-        headers: {
-          Authorization: `Client-ID ${ACCESS_KEY1}`,
-        },
-      }
+      `${API_BASE}/suggested?query=${query}&count=${count}`
     );
-
-    if (!response.ok) {
-      console.error("Error fetching wallpapers:", response);
-      return [];
-    }
-
-    const data = await response.json();
-    return data.map((photo: any) => ({
-      id: photo.id,
-      imageuri: photo.urls.regular,
-      title: photo.alt_description || "Wallpaper",
-      blur_hash: photo.blur_hash,
-      color: photo.color,
-    }));
+    if (!response.ok) return [];
+    return await response.json();
   } catch (error) {
-    console.error("Catch Error fetching suggested wallpapers:", error);
+    console.error("Error fetching suggested wallpapers:", error);
     return [];
   }
 }
@@ -183,85 +165,50 @@ export async function getLikedWallpapersDetails(): Promise<WallpaperTypes[]> {
     const storedData = await AsyncStorage.getItem(STORAGE_KEY.LIKED_WALLPAPERS);
     const likedWallpapers = storedData ? JSON.parse(storedData) : [];
 
-    const wallpapers: WallpaperTypes[] = [];
+    if (likedWallpapers.length === 0) return [];
 
-    for (let i = 0; i < likedWallpapers.length; i++) {
-      const response = await fetch(
-        `https://api.unsplash.com/photos/${likedWallpapers[i]}`,
-        {
-          headers: {
-            Authorization: `Client-ID ${ACCESS_KEY}`,
-          },
-        }
-      );
-      if (response.ok) {
-        const photo = await response.json();
-        wallpapers.push({
-          id: photo.id,
-          imageuri: photo.urls.regular,
-          title: photo.alt_description || "Wallpaper",
-          blur_hash: photo.blur_hash,
-          color: photo.color,
-        });
-      }
-    }
-
-    return wallpapers;
+    const response = await fetch(`${API_BASE}/getById`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ids: likedWallpapers }),
+    });
+    if (!response.ok) return [];
+    return await response.json();
   } catch (error) {
     console.error("Error fetching liked wallpapers:", error);
     return [];
   }
 }
-
-interface MonsterAPIStatusResponse {
-  status: "IN_PROGRESS" | "COMPLETED" | "FAILED" | "IN_QUEUE";
-  result?: {
-    output: string[];
-  };
-  process_id?: string;
-}
-
-interface MonsterAPIGenerateResponse {
-  status: string;
-  process_id: string;
-}
-
 export async function getAIGenratedWallpaper(
   query = "nature"
 ): Promise<WallpaperTypes> {
   try {
-    const result = await generateImage(query, true);
-
-    if (!result) {
-      console.error("Error generating AI wallpaper");
-      return {
-        id: "",
-        imageuri: "",
-        title: query,
-      };
+    const response = await fetch(`${API_BASE}/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({"prompt": query})
+    });
+    
+    if (!response.ok) {
+      throw new Error('Generation failed');
     }
-
-    if (result.status === "FAILED") {
-      console.error("AI wallpaper generation failed");
-      return {
-        id: "",
-        imageuri: "",
-        title: query,
-      };
-    }
-
-    if (result.result?.output?.length === 0) {
-      console.error("AI wallpaper generation failed");
-      return {
-        id: "",
-        imageuri: "",
-        title: query,
-      };
+    
+    const data: GenerateWallpaperResponse = await response.json();
+    
+    // Wait for the final status
+    const result = await waitForImageStatus(data.process_id);
+    
+    if (!result || result.status === "FAILED" || !result.imageUrl) {
+      throw new Error('Generation failed');
     }
 
     return {
-      id: result.process_id || "",
-      imageuri: result.result?.output?.[0] || "",
+      id: data.process_id,
+      imageuri: result.imageUrl,
       title: query,
     };
   } catch (error) {
@@ -274,89 +221,42 @@ export async function getAIGenratedWallpaper(
   }
 }
 
-async function checkImageStatus(
-  processId: string
-): Promise<MonsterAPIStatusResponse | null> {
-  try {
-    const response = await fetch(
-      `https://api.monsterapi.ai/v1/status/${processId}`,
-      {
-        headers: {
-          authorization: MONSTER_API_KEY || "",
-        },
-      }
-    );
+async function waitForImageStatus(processId: string): Promise<StatusCheckResponse | null> {
+  const maxAttempts = 30; // Maximum number of attempts (30 * 2 seconds = 60 seconds total)
+  let attempts = 0;
 
-    if (!response.ok) {
-      console.error("Error checking status:", response);
-      return null;
+  while (attempts < maxAttempts) {
+    const status = await checkImageStatus(processId);
+    
+    if (!status) return null;
+    
+    if (status.status === "COMPLETED" || status.status === "FAILED") {
+      return status;
     }
-
-    const data = await response.json();
-    return data as MonsterAPIStatusResponse;
-  } catch (error) {
-    console.error("Error checking status:", error);
-    return null;
+    
+    // Wait for 2 seconds before next attempt
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    attempts++;
   }
+  
+  return null;
 }
 
-async function generateImage(
-  prompt = "beautiful landscape",
-  safeFilter = true
-): Promise<MonsterAPIStatusResponse | null> {
-  const options = {
-    method: "POST",
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      authorization: MONSTER_API_KEY || "",
-    },
-    body: JSON.stringify({
-      prompt: `A high-resolution, visually stunning mobile wallpaper of ${prompt}, with vibrant colors, balanced contrast, and a captivating composition. Designed for perfect mobile fit with artistic and cinematic appeal.`,
-      safe_filter: safeFilter,
-      samples: 1,
-    }),
-  };
-
+async function checkImageStatus(processId: string): Promise<StatusCheckResponse | null> {
   try {
-    const response = await fetch(
-      "https://api.monsterapi.ai/v1/generate/txt2img",
-      options
-    );
+    const statusRequest: StatusCheckRequest = { process_id: processId };
+    const response = await fetch(`${API_BASE}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(statusRequest)
+    });
 
-    if (!response.ok) {
-      console.error("Error generating image:", response);
-      return null;
-    }
-
-    const data = (await response.json()) as MonsterAPIGenerateResponse;
-
-    // Poll for result with timeout
-    const processId = data.process_id;
-    let result: MonsterAPIStatusResponse | null = null;
-    let attempts = 0;
-    const maxAttempts = 20; // 1 minute timeout (20 * 3 seconds)
-
-    while (!result || ["IN_PROGRESS", "IN_QUEUE"].includes(result.status)) {
-      console.log("Checking status");
-
-      result = await checkImageStatus(processId);
-      if (!result) break;
-
-      if (attempts >= maxAttempts) {
-        console.error("Timeout generating image");
-        return null;
-      }
-
-      if (["IN_PROGRESS", "IN_QUEUE"].includes(result.status)) {
-        await new Promise((resolve) => setTimeout(resolve, 4000));
-        attempts++;
-      }
-    }
-
-    return result;
+    if (!response.ok) return null;
+    return await response.json();
   } catch (error) {
-    console.error("Error generating image:", error);
+    console.error("Error checking status:", error);
     return null;
   }
 }
