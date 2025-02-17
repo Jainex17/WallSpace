@@ -201,3 +201,44 @@ export const checkAIWallpaperStatus = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to check wallpaper status" });
   }
 };
+export const getWallpaperById = async (req: Request, res: Response) => {
+  const { ids } = req.body;
+
+  if (!ids || !Array.isArray(ids)) {
+    return res.status(400).json({ error: "Invalid IDs" });
+  }
+
+  try {
+    const wallpapers = [];
+    
+    for(let i = 0; i < ids.length; i++) {
+      const response = await fetch(
+        `https://api.unsplash.com/photos/${ids[i]}`,
+        {
+          headers: {
+            Authorization: `Client-ID ${ACCESS_KEY}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error(`Failed to fetch wallpaper with ID: ${ids[i]}`);
+        continue;
+      }
+
+      const photo = await response.json();
+      wallpapers.push({
+        id: photo.id,
+        imageuri: photo.urls.regular,
+        title: photo.alt_description || "Wallpaper",
+        blur_hash: photo.blur_hash,
+        color: photo.color,
+      });
+    }
+
+    res.json(wallpapers);
+  } catch (error) {
+    console.error('Get wallpaper by ID error:', error);
+    res.status(500).json({ error: "Failed to fetch wallpapers" });
+  }
+}
