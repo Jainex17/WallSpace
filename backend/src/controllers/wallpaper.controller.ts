@@ -38,7 +38,7 @@ export const getCarouselWallpapers = (req: Request, res: Response) => {
 };
 
 export const getExploreWallpapers = async (req: Request, res: Response) => {
-  const { query = "mobile wallpaper", count = 10 } = req.query;
+  const { query = "mobile wallpaper", count = 20 } = req.query;
   try {
     const response = await fetch(
       `https://api.unsplash.com/photos/random?query=${query}&count=${count}`,

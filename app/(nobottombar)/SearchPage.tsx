@@ -42,7 +42,7 @@ export default function SearchPage() {
         >
           <Searchbar
             placeholder="Search Wallpapers"
-            onChangeText={(query) => handleSearch(query)}
+            onChangeText={(query) => setSearchQuery(query)}
             value={searchQuery}
             onSubmitEditing={() => handleSearch(searchQuery)}
             style={{

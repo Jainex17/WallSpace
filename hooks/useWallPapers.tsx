@@ -109,7 +109,7 @@ export function useWallpaperData(query?: string) {
 
 export async function getExploreWallpapers(
   query = "mobile wallpaper",
-  count = 10
+  count = 20
 ): Promise<WallpaperTypes[]> {
   try {
     const response = await fetch(
