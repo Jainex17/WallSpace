@@ -1,6 +1,19 @@
 # WallSpace
 
+Welcome to WallSpace, your ultimate React Native app for stunning wallpapers. Explore our extensive collection of high-quality wallpapers to personalize your mobile devices. Whether you love nature, abstract art, or sleek cars, we have something for everyone.
 
+**Features:**
+
+*   **Ad-Free Experience:** Enjoy browsing without interruptions.
+*   **Open Source:** Access our code and contribute to the project.
+*   **Vast Wallpaper Library:** Discover a wide range of wallpapers in various resolutions and styles.
+*   **Diverse Categories:** Explore categories like abstract, nature, cars, and more.
+*   **Search Functionality:** Easily find the perfect wallpaper with a quick search.
+*   **One-Tap Save:** Set any wallpaper as your background effortlessly.
+*   **Favorites List:** Save and manage your favorite wallpapers.
+*   **Daily Wallpaper:** Receive a new wallpaper suggestion every day.
+
+Customize your device with WallSpace and enjoy a fresh look every day!
 
 <table>
   <tr>
