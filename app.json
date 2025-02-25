@@ -1,22 +1,23 @@
 {
   "expo": {
-    "name": "wallpaper-app",
-    "slug": "wallpaper-app",
+    "name": "WallSpace",
+    "slug": "WallSpace",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "WallSpace",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.WallSpace.WallSpace",
+      "buildNumber": "1.0.0"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      },
-      "permissions": ["INTERNET"]
+      "package": "com.WallSpace.WallSpace",
+      "permissions": [
+        "INTERNET"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "f3d1360a-9172-4068-96d7-80cbcde472e9"
+      }
     }
   }
 }

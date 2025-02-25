@@ -13,10 +13,10 @@ export default function Account() {
     <ThemedView style={{ flex: 1 }}>
       <ScrollView style={styles.container}>
         <ThemedText type="title" style={styles.heading}>
-          WallX
+        WallSpace
         </ThemedText>
         <ThemedText type="subtitle" style={styles.subheading}>
-          Chnage your home with WallX
+          Chnage your home with WallSpace
         </ThemedText>
 
         <View style={styles.themeButtonsContainer}>
@@ -80,7 +80,7 @@ export default function Account() {
               { color: Colors[currentTheme].text, paddingVertical: 15 },
             ]}
             onPress={() =>
-              ToastAndroid.show("WallX v1.0.0", ToastAndroid.SHORT)
+              ToastAndroid.show("WallSpace v1.0.0", ToastAndroid.SHORT)
             }
           >
             Versions
@@ -96,7 +96,7 @@ export default function Account() {
           <Text
             style={{ color: Colors[currentTheme].tabIconDefault, fontSize: 13 }}
           >
-            WallX Wallpapaer Mobile App LLC.
+            WallSpace Wallpapaer Mobile App LLC.
           </Text>
         </View>
       </ScrollView>
