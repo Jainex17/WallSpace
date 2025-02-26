@@ -1,13 +1,6 @@
 <div align="center">
   <h1> WallSpace</h1>
   <p><i>Customize your device with WallSpace and enjoy a fresh look !</i></p>
-  
-  [![GitHub stars](https://img.shields.io/github/stars/Jainex17/WallSpace?style=social)](https://github.com/Jainex17/WallSpace)
-  [![GitHub license](https://img.shields.io/github/license/jainex17/WallSpace)](https://github.com/Jainex17/WallSpace/blob/main/LICENSE)
-  [![React Native](https://img.shields.io/badge/React%20Native-v0.70+-blue)](https://reactnative.dev/)
-  [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/yourusername/wallpaper-app/pulls)
-  
-  <br/>
 </div>
 
 **Features:**
