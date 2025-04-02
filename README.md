@@ -14,14 +14,13 @@
 *   **Favorites List:** Save and manage your favorite wallpapers.
 *   **Daily Wallpaper:** Receive a new wallpaper suggestion every day.
 
-
 <table>
   <tr>
     <td>
       <img src="https://github.com/user-attachments/assets/355d20f2-7476-4f75-a38b-f811261d6b99" />
     </td>
     <td>
-      <img src="https://github.com/user-attachments/assets/eb542bba-58c5-4407-bd60-b5294b51fa5f" />
+      <img src="https://github.com/user-attachments/assets/1ccf0738-da9c-43aa-9d10-5864c2af9a03" />
     </td>
     <td>
       <img src="https://github.com/user-attachments/assets/cbe7b2ce-4521-4c28-bcaf-5ecd991ba049" />
